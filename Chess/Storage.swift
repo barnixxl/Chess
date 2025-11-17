@@ -1,10 +1,3 @@
-//
-//  Storage.swift
-//  Chess
-//
-//  Created by Khislatjon Valijonov on 09/05/24.
-//  Copyright © 2024 Nick Lockwood. All rights reserved.
-//
 
 import Foundation
 

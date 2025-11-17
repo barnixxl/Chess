@@ -1,10 +1,3 @@
-//
-//  GameTests.swift
-//  ChessTests
-//
-//  Created by Nick Lockwood on 12/07/2024.
-//  Copyright © 2024 Nick Lockwood. All rights reserved.
-//
 
 @testable import Chess
 import XCTest

@@ -1,10 +1,4 @@
-//
-//  Game.swift
-//  Chess
-//
-//  Created by Nick Lockwood on 24/09/2020.
-//  Copyright © 2020 Nick Lockwood. All rights reserved.
-//
+
 
 struct Move: Equatable, Codable {
     var from, to: Position

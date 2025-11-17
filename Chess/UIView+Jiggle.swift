@@ -1,10 +1,3 @@
-//
-//  UIView+Jiggle.swift
-//  Chess
-//
-//  Created by Nick Lockwood on 22/10/2022.
-//  Copyright © 2022 Nick Lockwood. All rights reserved.
-//
 
 import UIKit
 
