@@ -2,24 +2,24 @@
 import UIKit
 
 class AuthViewController: UIViewController {
-
-    private let bubbleLayer = CAEmitterLayer()
-    private var bubbles: [UIView] = []
+    private var stars: [UIView] = []
+    private var pixelParticles: [UIView] = []
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupBackground()
-        setupBubbleAnimation()
+        setupPixelBackground()
+        setupStarAnimation()
         setupUI()
     }
 
-    private func setupBackground() {
+    private func setupPixelBackground() {
+        // Пиксельный градиентный фон
         let gradientLayer = CAGradientLayer()
         gradientLayer.frame = view.bounds
         gradientLayer.colors = [
-            UIColor(red: 0.4, green: 0.8, blue: 1.0, alpha: 1.0).cgColor,
-            UIColor(red: 0.6, green: 0.4, blue: 1.0, alpha: 1.0).cgColor,
-            UIColor(red: 1.0, green: 0.5, blue: 0.8, alpha: 1.0).cgColor
+            UIColor(red: 0.1, green: 0.1, blue: 0.2, alpha: 1.0).cgColor,
+            UIColor(red: 0.2, green: 0.1, blue: 0.3, alpha: 1.0).cgColor,
+            UIColor(red: 0.15, green: 0.05, blue: 0.25, alpha: 1.0).cgColor,
         ]
         gradientLayer.locations = [0.0, 0.5, 1.0]
         gradientLayer.startPoint = CGPoint(x: 0, y: 0)
@@ -27,100 +27,139 @@ class AuthViewController: UIViewController {
         view.layer.insertSublayer(gradientLayer, at: 0)
     }
 
-    private func setupBubbleAnimation() {
-        // Создаем пузырьки на фоне
-        for i in 0..<15 {
-            let bubble = UIView()
-            let size = CGFloat.random(in: 40...120)
-            bubble.frame = CGRect(
-                x: CGFloat.random(in: 0...view.bounds.width),
-                y: view.bounds.height + size,
+    private func setupStarAnimation() {
+        // Создаем пиксельные звезды на фоне
+        for i in 0 ..< 30 {
+            let star = UIView()
+            let size: CGFloat = [4, 6, 8].randomElement()!
+            star.frame = CGRect(
+                x: CGFloat.random(in: 0 ... view.bounds.width),
+                y: CGFloat.random(in: 0 ... view.bounds.height),
                 width: size,
                 height: size
             )
-            bubble.backgroundColor = UIColor.white.withAlphaComponent(0.3)
-            bubble.layer.cornerRadius = size / 2
-            bubble.layer.borderWidth = 2
-            bubble.layer.borderColor = UIColor.white.withAlphaComponent(0.5).cgColor
-            view.addSubview(bubble)
-            bubbles.append(bubble)
+            star.backgroundColor = .white
+            star.alpha = CGFloat.random(in: 0.3 ... 1.0)
+            view.addSubview(star)
+            stars.append(star)
 
-            // Анимация подъема пузырька
-            let duration = Double.random(in: 3...8)
-            let delay = Double(i) * 0.3
-            let xOffset = CGFloat.random(in: -50...50)
-
-            UIView.animate(withDuration: duration, delay: delay, options: [.repeat, .curveLinear], animations: {
-                bubble.frame.origin.y = -size
-                bubble.frame.origin.x += xOffset
+            // Мерцание звезд
+            let duration = Double.random(in: 1.0 ... 3.0)
+            let delay = Double(i) * 0.1
+            
+            UIView.animate(withDuration: duration, delay: delay, options: [.repeat, .autoreverse], animations: {
+                star.alpha = CGFloat.random(in: 0.2 ... 1.0)
             }, completion: nil)
+        }
+        
+        // Добавляем падающие пиксельные частицы
+        for i in 0 ..< 8 {
+            let particle = UIView()
+            let size: CGFloat = 6
+            particle.frame = CGRect(
+                x: CGFloat.random(in: 0 ... view.bounds.width),
+                y: -size,
+                width: size,
+                height: size
+            )
+            particle.backgroundColor = UIColor(red: 0.5, green: 0.8, blue: 1.0, alpha: 0.6)
+            view.addSubview(particle)
+            pixelParticles.append(particle)
 
-            // Пульсация
-            UIView.animate(withDuration: 1.5, delay: delay, options: [.repeat, .autoreverse], animations: {
-                bubble.transform = CGAffineTransform(scaleX: 1.2, y: 1.2)
+            let duration = Double.random(in: 4 ... 8)
+            let delay = Double(i) * 0.5
+            
+            UIView.animate(withDuration: duration, delay: delay, options: [.repeat, .curveLinear], animations: {
+                particle.frame.origin.y = self.view.bounds.height + size
             }, completion: nil)
         }
     }
 
     private func setupUI() {
+        // Пиксельный заголовок
         let titleLabel = UILabel()
-        titleLabel.text = "♟️ Chess"
-        titleLabel.font = UIFont.systemFont(ofSize: 48, weight: .bold)
-        titleLabel.textColor = .white
+        titleLabel.text = "MCP CHESS"
+        titleLabel.font = UIFont.monospacedSystemFont(ofSize: 48, weight: .black)
+        titleLabel.textColor = UIColor(red: 1.0, green: 0.9, blue: 0.3, alpha: 1.0)
         titleLabel.textAlignment = .center
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        
+        // Добавляем пиксельную тень
+        titleLabel.layer.shadowColor = UIColor.black.cgColor
+        titleLabel.layer.shadowOffset = CGSize(width: 4, height: 4)
+        titleLabel.layer.shadowRadius = 0
+        titleLabel.layer.shadowOpacity = 1.0
         view.addSubview(titleLabel)
 
+        // Шахматная иконка
+        let chessIcon = UILabel()
+        chessIcon.text = "♟️"
+        chessIcon.font = UIFont.systemFont(ofSize: 60)
+        chessIcon.textAlignment = .center
+        chessIcon.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(chessIcon)
+
         let subtitleLabel = UILabel()
-        subtitleLabel.text = "Выберите действие"
-        subtitleLabel.font = UIFont.systemFont(ofSize: 20, weight: .medium)
-        subtitleLabel.textColor = .white.withAlphaComponent(0.9)
+        subtitleLabel.text = "ВЫБЕРИТЕ ДЕЙСТВИЕ"
+        subtitleLabel.font = UIFont.monospacedSystemFont(ofSize: 16, weight: .bold)
+        subtitleLabel.textColor = UIColor(red: 0.7, green: 0.9, blue: 1.0, alpha: 1.0)
         subtitleLabel.textAlignment = .center
         subtitleLabel.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(subtitleLabel)
 
         let stackView = UIStackView()
         stackView.axis = .vertical
-        stackView.spacing = 20
+        stackView.spacing = 25
         stackView.alignment = .fill
         stackView.distribution = .fillEqually
         stackView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(stackView)
 
-        let loginButton = createBubbleButton(title: "Войти", color: UIColor(red: 0.2, green: 0.7, blue: 0.9, alpha: 1.0))
+        let loginButton = createPixelButton(title: "ВХОД", color: UIColor(red: 0.2, green: 0.6, blue: 1.0, alpha: 1.0))
         loginButton.addTarget(self, action: #selector(loginTapped), for: .touchUpInside)
         stackView.addArrangedSubview(loginButton)
 
-        let registerButton = createBubbleButton(title: "Зарегистрироваться", color: UIColor(red: 0.9, green: 0.3, blue: 0.6, alpha: 1.0))
+        let registerButton = createPixelButton(title: "РЕГИСТРАЦИЯ", color: UIColor(red: 1.0, green: 0.3, blue: 0.6, alpha: 1.0))
         registerButton.addTarget(self, action: #selector(registerTapped), for: .touchUpInside)
         stackView.addArrangedSubview(registerButton)
 
         NSLayoutConstraint.activate([
             titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 80),
+            titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 60),
+
+            chessIcon.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            chessIcon.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 10),
 
             subtitleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            subtitleLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 20),
+            subtitleLabel.topAnchor.constraint(equalTo: chessIcon.bottomAnchor, constant: 20),
 
             stackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            stackView.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: 40),
+            stackView.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: 60),
             stackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 40),
             stackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -40),
-            stackView.heightAnchor.constraint(equalToConstant: 140)
+            stackView.heightAnchor.constraint(equalToConstant: 140),
         ])
     }
 
-    private func createBubbleButton(title: String, color: UIColor) -> UIButton {
+    private func createPixelButton(title: String, color: UIColor) -> UIButton {
         let button = UIButton(type: .system)
         button.setTitle(title, for: .normal)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 22, weight: .bold)
+        button.titleLabel?.font = UIFont.monospacedSystemFont(ofSize: 20, weight: .black)
         button.setTitleColor(.white, for: .normal)
         button.backgroundColor = color
-        button.layer.cornerRadius = 30
+        
+        // Пиксельный стиль - без скругления
+        button.layer.cornerRadius = 0
+        
+        // Пиксельная тень
         button.layer.shadowColor = UIColor.black.cgColor
-        button.layer.shadowOffset = CGSize(width: 0, height: 4)
-        button.layer.shadowRadius = 8
-        button.layer.shadowOpacity = 0.3
+        button.layer.shadowOffset = CGSize(width: 6, height: 6)
+        button.layer.shadowRadius = 0
+        button.layer.shadowOpacity = 0.8
+        
+        // Пиксельная рамка
+        button.layer.borderWidth = 4
+        button.layer.borderColor = UIColor.black.cgColor
 
         // Анимация при нажатии
         button.addTarget(self, action: #selector(buttonPressed(_:)), for: .touchDown)
@@ -130,13 +169,16 @@ class AuthViewController: UIViewController {
     }
 
     @objc private func buttonPressed(_ sender: UIButton) {
-        UIView.animate(withDuration: 0.1) {
-            sender.transform = CGAffineTransform(scaleX: 0.95, y: 0.95)
+        // Пиксельная анимация нажатия - смещение тени
+        UIView.animate(withDuration: 0.05) {
+            sender.layer.shadowOffset = CGSize(width: 2, height: 2)
+            sender.transform = CGAffineTransform(translationX: 4, y: 4)
         }
     }
 
     @objc private func buttonReleased(_ sender: UIButton) {
-        UIView.animate(withDuration: 0.1) {
+        UIView.animate(withDuration: 0.05) {
+            sender.layer.shadowOffset = CGSize(width: 6, height: 6)
             sender.transform = .identity
         }
     }
@@ -165,7 +207,8 @@ class AuthViewController: UIViewController {
 
     private func navigateToGame() {
         guard let windowScene = view.window?.windowScene,
-              let delegate = windowScene.delegate as? SceneDelegate else {
+              let delegate = windowScene.delegate as? SceneDelegate
+        else {
             return
         }
 
@@ -184,4 +227,3 @@ class AuthViewController: UIViewController {
         }
     }
 }
-

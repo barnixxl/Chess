@@ -15,7 +15,7 @@ class ViewController: UIViewController {
         var directory = FileManager.default
             .urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
         #if os(macOS)
-        directory = directory.appendingPathComponent(Bundle.main.bundleIdentifier!)
+            directory = directory.appendingPathComponent(Bundle.main.bundleIdentifier!)
         #endif
         try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         return directory.appendingPathComponent("game.json")
