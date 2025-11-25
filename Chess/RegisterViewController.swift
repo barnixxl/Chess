@@ -49,7 +49,6 @@ class RegisterViewController: UIViewController {
 
             let duration = Double.random(in: 1.0 ... 3.0)
             let delay = Double(i) * 0.1
-            
             UIView.animate(withDuration: duration, delay: delay, options: [.repeat, .autoreverse], animations: {
                 star.alpha = CGFloat.random(in: 0.2 ... 1.0)
             }, completion: nil)
@@ -73,7 +72,6 @@ class RegisterViewController: UIViewController {
         titleLabel.textColor = UIColor(red: 1.0, green: 0.3, blue: 0.6, alpha: 1.0)
         titleLabel.textAlignment = .center
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        
         // Пиксельная тень
         titleLabel.layer.shadowColor = UIColor.black.cgColor
         titleLabel.layer.shadowOffset = CGSize(width: 4, height: 4)
@@ -106,7 +104,6 @@ class RegisterViewController: UIViewController {
         emailTextField.returnKeyType = .next
         emailTextField.delegate = self
         emailTextField.translatesAutoresizingMaskIntoConstraints = false
-        
         emailTextField.attributedPlaceholder = NSAttributedString(
             string: "ИМЯ ПОЛЬЗОВАТЕЛЯ",
             attributes: [NSAttributedString.Key.foregroundColor: UIColor.white.withAlphaComponent(0.5)]
@@ -127,7 +124,6 @@ class RegisterViewController: UIViewController {
         passwordTextField.returnKeyType = .next
         passwordTextField.delegate = self
         passwordTextField.translatesAutoresizingMaskIntoConstraints = false
-        
         passwordTextField.attributedPlaceholder = NSAttributedString(
             string: "ПАРОЛЬ",
             attributes: [NSAttributedString.Key.foregroundColor: UIColor.white.withAlphaComponent(0.5)]
@@ -148,7 +144,6 @@ class RegisterViewController: UIViewController {
         confirmPasswordTextField.returnKeyType = .done
         confirmPasswordTextField.delegate = self
         confirmPasswordTextField.translatesAutoresizingMaskIntoConstraints = false
-        
         confirmPasswordTextField.attributedPlaceholder = NSAttributedString(
             string: "ПОДТВЕРДИТЕ ПАРОЛЬ",
             attributes: [NSAttributedString.Key.foregroundColor: UIColor.white.withAlphaComponent(0.5)]
@@ -277,4 +272,3 @@ extension RegisterViewController: UITextFieldDelegate {
         return true
     }
 }
-

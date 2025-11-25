@@ -68,7 +68,6 @@ class AuthViewController: UIViewController {
 
             let duration = Double.random(in: 4 ... 8)
             let delay = Double(i) * 0.5
-            
             UIView.animate(withDuration: duration, delay: delay, options: [.repeat, .curveLinear], animations: {
                 particle.frame.origin.y = self.view.bounds.height + size
             }, completion: nil)
@@ -83,7 +82,6 @@ class AuthViewController: UIViewController {
         titleLabel.textColor = UIColor(red: 1.0, green: 0.9, blue: 0.3, alpha: 1.0)
         titleLabel.textAlignment = .center
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        
         // Добавляем пиксельную тень
         titleLabel.layer.shadowColor = UIColor.black.cgColor
         titleLabel.layer.shadowOffset = CGSize(width: 4, height: 4)
@@ -212,11 +210,10 @@ class AuthViewController: UIViewController {
             return
         }
 
-        let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        let gameVC = storyboard.instantiateInitialViewController()
-
+        let mainMenuVC = MainMenuViewController()
+        
         UIView.transition(with: delegate.window!, duration: 0.5, options: .transitionCrossDissolve, animations: {
-            delegate.window?.rootViewController = gameVC
+            delegate.window?.rootViewController = mainMenuVC
         }, completion: nil)
     }
 

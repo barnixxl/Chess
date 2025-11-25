@@ -48,7 +48,6 @@ class LoginViewController: UIViewController {
 
             let duration = Double.random(in: 1.0 ... 3.0)
             let delay = Double(i) * 0.1
-            
             UIView.animate(withDuration: duration, delay: delay, options: [.repeat, .autoreverse], animations: {
                 star.alpha = CGFloat.random(in: 0.2 ... 1.0)
             }, completion: nil)
@@ -72,7 +71,6 @@ class LoginViewController: UIViewController {
         titleLabel.textColor = UIColor(red: 0.2, green: 0.6, blue: 1.0, alpha: 1.0)
         titleLabel.textAlignment = .center
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        
         // Пиксельная тень
         titleLabel.layer.shadowColor = UIColor.black.cgColor
         titleLabel.layer.shadowOffset = CGSize(width: 4, height: 4)
@@ -105,7 +103,6 @@ class LoginViewController: UIViewController {
         nameTextfield.returnKeyType = .next
         nameTextfield.delegate = self
         nameTextfield.translatesAutoresizingMaskIntoConstraints = false
-        
         // Изменяем цвет placeholder
         nameTextfield.attributedPlaceholder = NSAttributedString(
             string: "ИМЯ ПОЛЬЗОВАТЕЛЯ",
@@ -127,7 +124,6 @@ class LoginViewController: UIViewController {
         passwordTextField.returnKeyType = .done
         passwordTextField.delegate = self
         passwordTextField.translatesAutoresizingMaskIntoConstraints = false
-        
         passwordTextField.attributedPlaceholder = NSAttributedString(
             string: "ПАРОЛЬ",
             attributes: [NSAttributedString.Key.foregroundColor: UIColor.white.withAlphaComponent(0.5)]
