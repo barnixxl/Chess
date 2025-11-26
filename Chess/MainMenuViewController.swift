@@ -201,7 +201,10 @@ class MainMenuViewController: UIViewController {
     }
 
     @objc private func accountSettingsTapped() {
-        print("Account Settings Tapped")
+        let settingsVC = SettingsViewController()
+        settingsVC.modalPresentationStyle = .fullScreen
+        settingsVC.modalTransitionStyle = .crossDissolve
+        present(settingsVC, animated: true, completion: nil)
     }
 
     @objc private func leaderboardTapped() {

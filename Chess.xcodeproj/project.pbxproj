@@ -24,6 +24,7 @@
 		4550188E2ECE8C3500F38230 /* AuthViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4550188D2ECE8C3500F38230 /* AuthViewController.swift */; };
 		455018912ECE8C4000F38230 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4550188F2ECE8C4000F38230 /* LoginViewController.swift */; };
 		455018922ECE8C4000F38230 /* RegisterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 455018902ECE8C4000F38230 /* RegisterViewController.swift */; };
+		4566C8E22ED73E410053582C /* AccountSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4566C8E12ED73E410053582C /* AccountSettingsViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -57,6 +58,7 @@
 		4550188D2ECE8C3500F38230 /* AuthViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewController.swift; sourceTree = "<group>"; };
 		4550188F2ECE8C4000F38230 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		455018902ECE8C4000F38230 /* RegisterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterViewController.swift; sourceTree = "<group>"; };
+		4566C8E12ED73E410053582C /* AccountSettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountSettingsViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -103,6 +105,7 @@
 				4550188F2ECE8C4000F38230 /* LoginViewController.swift */,
 				455018902ECE8C4000F38230 /* RegisterViewController.swift */,
 				4521C7AB2ED644DC007E5B8F /* MainMenuViewController.swift */,
+				4566C8E12ED73E410053582C /* AccountSettingsViewController.swift */,
 				01C5BA57251CC44D00A53B56 /* Game.swift */,
 				01642A84251A882400039186 /* AppDelegate.swift */,
 				01642A86251A882400039186 /* SceneDelegate.swift */,
@@ -256,6 +259,7 @@
 				4550188E2ECE8C3500F38230 /* AuthViewController.swift in Sources */,
 				01C5BA58251CC44D00A53B56 /* Game.swift in Sources */,
 				01642A99251A89B400039186 /* BoardView.swift in Sources */,
+				4566C8E22ED73E410053582C /* AccountSettingsViewController.swift in Sources */,
 				01642A9B251A9CA600039186 /* Board.swift in Sources */,
 				0E6FCBCD2BED202900193845 /* Storage.swift in Sources */,
 				01642A85251A882400039186 /* AppDelegate.swift in Sources */,

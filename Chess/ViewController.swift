@@ -47,6 +47,15 @@ class ViewController: UIViewController {
         }
     }
 
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        updateUI()
+        if let themeName = Storage.shared.boardTheme,
+           let theme = Theme(rawValue: themeName) {
+            boardView?.theme = theme
+        }
+    }
+
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         if isPaused {
@@ -93,10 +102,8 @@ class ViewController: UIViewController {
 
     @IBAction private func settings() {
         let vc = SettingsViewController()
-        vc.onThemeSelect = { self.boardView?.theme = $0 }
-        vc.onFlipBlackWhenHuman = {
-            self.boardView?.flipBlackPieces = $0 && self.game.blackIsHuman
-        }
+        vc.modalPresentationStyle = .fullScreen
+        vc.modalTransitionStyle = .crossDissolve
         present(vc, animated: true)
     }
 }
