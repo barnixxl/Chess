@@ -1,5 +1,6 @@
 import uvicorn
 from fastapi import FastAPI
+from starlette.responses import RedirectResponse
 from auth.view import router as auth_router
 from conn import init_db 
 from contextlib import asynccontextmanager
@@ -28,9 +29,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+@app.get("/")
+async def redirect_to_docs():
+    return RedirectResponse(url="/docs")
+
+
 @app.get("/health")
 async def health_check():
     return {"status": "ok"}
+
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host=settings.APP_HOST, port=settings.APP_PORT, reload=True)
