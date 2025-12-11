@@ -75,30 +75,16 @@ class MainMenuViewController: UIViewController {
         chessIcon.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(chessIcon)
 
-        // Основные кнопки по центру
-        let mainButtonsStack = UIStackView()
-        mainButtonsStack.axis = .vertical
-        mainButtonsStack.spacing = 18
-        mainButtonsStack.alignment = .fill
-        mainButtonsStack.distribution = .fillEqually
-        mainButtonsStack.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(mainButtonsStack)
-
-        let mainButtonsData: [(title: String, color: UIColor, action: Selector)] = [
-            ("ИГРА С КОМПЬЮТЕРОМ", UIColor(red: 0.9, green: 0.7, blue: 0.3, alpha: 1.0), #selector(playTapped)),
-            ("ИГРА С ДРУГОМ", UIColor(red: 0.7, green: 0.3, blue: 0.2, alpha: 1.0), #selector(friendsTapped))
-        ]
-
-        for data in mainButtonsData {
-            let button = createPixelButton(title: data.title, color: data.color)
-            button.addTarget(self, action: data.action, for: .touchUpInside)
-            mainButtonsStack.addArrangedSubview(button)
-        }
+        // Большая кнопка игры с компьютером по центру
+        let playButton = createPixelButton(title: "ИГРА С КОМПЬЮТЕРОМ", color: UIColor(red: 0.9, green: 0.7, blue: 0.3, alpha: 1.0))
+        playButton.addTarget(self, action: #selector(playTapped), for: .touchUpInside)
+        playButton.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(playButton)
 
         // Маленькие иконки внизу
         let bottomIconsStack = UIStackView()
         bottomIconsStack.axis = .horizontal
-        bottomIconsStack.spacing = 15
+        bottomIconsStack.spacing = 20
         bottomIconsStack.alignment = .center
         bottomIconsStack.distribution = .fillEqually
         bottomIconsStack.translatesAutoresizingMaskIntoConstraints = false
@@ -106,9 +92,8 @@ class MainMenuViewController: UIViewController {
 
         let iconsData: [(icon: String, color: UIColor, action: Selector)] = [
             ("🏆", UIColor(red: 0.9, green: 0.7, blue: 0.3, alpha: 1.0), #selector(leaderboardTapped)),
-            ("⏱", UIColor(red: 0.4, green: 0.6, blue: 0.5, alpha: 1.0), #selector(historyTapped)),
             ("⚙️", UIColor(red: 0.5, green: 0.5, blue: 0.5, alpha: 1.0), #selector(accountSettingsTapped)),
-            ("👥", UIColor(red: 0.9, green: 0.8, blue: 0.4, alpha: 1.0), #selector(friendsTapped))
+            ("📊", UIColor(red: 0.4, green: 0.6, blue: 0.5, alpha: 1.0), #selector(statisticsTapped))
         ]
 
         for data in iconsData {
@@ -124,35 +109,32 @@ class MainMenuViewController: UIViewController {
             chessIcon.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             chessIcon.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 10),
             
-            mainButtonsStack.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            mainButtonsStack.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: 20),
-            mainButtonsStack.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.75),
-            mainButtonsStack.heightAnchor.constraint(equalToConstant: 160),
+            playButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            playButton.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: 20),
+            playButton.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.8),
+            playButton.heightAnchor.constraint(equalToConstant: 80),
             
             bottomIconsStack.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             bottomIconsStack.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -30),
-            bottomIconsStack.widthAnchor.constraint(equalToConstant: 280),
-            bottomIconsStack.heightAnchor.constraint(equalToConstant: 60)
+            bottomIconsStack.widthAnchor.constraint(equalToConstant: 240),
+            bottomIconsStack.heightAnchor.constraint(equalToConstant: 70)
         ])
     }
     
     private func createIconButton(icon: String, color: UIColor) -> UIButton {
         let button = UIButton(type: .system)
         button.setTitle(icon, for: .normal)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 28)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 36)
         button.backgroundColor = color
-        
         button.layer.cornerRadius = 0
-        button.layer.borderWidth = 3
+        button.layer.borderWidth = 4
         button.layer.borderColor = UIColor.black.cgColor
-        
         button.layer.shadowColor = UIColor.black.cgColor
-        button.layer.shadowOffset = CGSize(width: 4, height: 4)
+        button.layer.shadowOffset = CGSize(width: 5, height: 5)
         button.layer.shadowRadius = 0
         button.layer.shadowOpacity = 1.0
-        
-        button.widthAnchor.constraint(equalToConstant: 60).isActive = true
-        button.heightAnchor.constraint(equalToConstant: 60).isActive = true
+        button.widthAnchor.constraint(equalToConstant: 70).isActive = true
+        button.heightAnchor.constraint(equalToConstant: 70).isActive = true
 
         button.addTarget(self, action: #selector(buttonPressed(_:)), for: .touchDown)
         button.addTarget(self, action: #selector(buttonReleased(_:)), for: [.touchUpInside, .touchUpOutside, .touchCancel])
@@ -163,14 +145,12 @@ class MainMenuViewController: UIViewController {
     private func createPixelButton(title: String, color: UIColor) -> UIButton {
         let button = UIButton(type: .system)
         button.setTitle(title, for: .normal)
-        button.titleLabel?.font = UIFont.monospacedSystemFont(ofSize: 18, weight: .black)
+        button.titleLabel?.font = UIFont.monospacedSystemFont(ofSize: 22, weight: .black)
         button.setTitleColor(.white, for: .normal)
         button.backgroundColor = color
-        
         button.layer.cornerRadius = 0
         button.layer.borderWidth = 4
         button.layer.borderColor = UIColor.black.cgColor
-        
         button.layer.shadowColor = UIColor.black.cgColor
         button.layer.shadowOffset = CGSize(width: 6, height: 6)
         button.layer.shadowRadius = 0
@@ -196,10 +176,6 @@ class MainMenuViewController: UIViewController {
         }
     }
 
-    @objc private func gameSettingsTapped() {
-        print("Game Settings Tapped")
-    }
-
     @objc private func accountSettingsTapped() {
         let settingsVC = SettingsViewController()
         settingsVC.modalPresentationStyle = .fullScreen
@@ -208,17 +184,19 @@ class MainMenuViewController: UIViewController {
     }
 
     @objc private func leaderboardTapped() {
-        print("Leaderboard Tapped")
-    }
-
-    @objc private func friendsTapped() {
-        print("Friends Tapped")
+        let leaderboardVC = LeaderboardViewController()
+        leaderboardVC.modalPresentationStyle = .fullScreen
+        leaderboardVC.modalTransitionStyle = .crossDissolve
+        present(leaderboardVC, animated: true, completion: nil)
     }
     
-    @objc private func historyTapped() {
-        print("History Tapped")
+    @objc private func statisticsTapped() {
+        let statsVC = StatisticsViewController()
+        statsVC.modalPresentationStyle = .fullScreen
+        statsVC.modalTransitionStyle = .crossDissolve
+        present(statsVC, animated: true, completion: nil)
     }
-
+    
     @objc private func playTapped() {
         guard let windowScene = view.window?.windowScene,
               let delegate = windowScene.delegate as? SceneDelegate

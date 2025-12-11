@@ -9,6 +9,7 @@ class RegisterViewController: UIViewController {
     private let passwordTextField = UITextField()
     private let confirmPasswordTextField = UITextField()
     private let confirmButton = UIButton(type: .system)
+    private let loadingIndicator = UIActivityIndicatorView(style: .large)
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -167,6 +168,12 @@ class RegisterViewController: UIViewController {
         confirmButton.addTarget(self, action: #selector(buttonPressed(_:)), for: .touchDown)
         confirmButton.addTarget(self, action: #selector(buttonReleased(_:)), for: [.touchUpInside, .touchUpOutside, .touchCancel])
         view.addSubview(confirmButton)
+        
+        // Индикатор загрузки
+        loadingIndicator.color = .white
+        loadingIndicator.hidesWhenStopped = true
+        loadingIndicator.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(loadingIndicator)
 
         NSLayoutConstraint.activate([
             backButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
@@ -200,6 +207,9 @@ class RegisterViewController: UIViewController {
             confirmButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             confirmButton.widthAnchor.constraint(equalToConstant: 260),
             confirmButton.heightAnchor.constraint(equalToConstant: 60),
+            
+            loadingIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            loadingIndicator.topAnchor.constraint(equalTo: confirmButton.bottomAnchor, constant: 20),
         ])
     }
 
@@ -223,6 +233,27 @@ class RegisterViewController: UIViewController {
     }
 
     @objc private func confirmTapped() {
+        // Валидация полей
+        guard let username = emailTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines), !username.isEmpty else {
+            showError(message: "Введите имя пользователя")
+            return
+        }
+        
+        guard let password = passwordTextField.text, !password.isEmpty else {
+            showError(message: "Введите пароль")
+            return
+        }
+        
+        guard let confirmPassword = confirmPasswordTextField.text, !confirmPassword.isEmpty else {
+            showError(message: "Подтвердите пароль")
+            return
+        }
+        
+        guard password == confirmPassword else {
+            showError(message: "Пароли не совпадают")
+            return
+        }
+        
         // Анимация нажатия
         UIView.animate(withDuration: 0.1, animations: {
             self.confirmButton.layer.shadowOffset = CGSize(width: 0, height: 0)
@@ -233,11 +264,48 @@ class RegisterViewController: UIViewController {
                 self.confirmButton.transform = .identity
             }
         }
-
-        // Переход в игру (без проверок)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            self.onSuccess?()
+        
+        // Скрываем клавиатуру
+        view.endEditing(true)
+        
+        // Показываем индикатор загрузки
+        loadingIndicator.startAnimating()
+        confirmButton.isEnabled = false
+        
+        // Вызов API
+        APIService.shared.register(username: username, password: password) { [weak self] result in
+            guard let self = self else { return }
+            
+            self.loadingIndicator.stopAnimating()
+            self.confirmButton.isEnabled = true
+            
+            switch result {
+            case .success(let tokenResponse):
+                // Проверяем успешность ответа
+                guard tokenResponse.success else {
+                    self.showError(message: "Регистрация не удалась")
+                    return
+                }
+                
+                // Сохраняем токен и имя пользователя
+                Storage.shared.authToken = tokenResponse.token
+                Storage.shared.username = username
+                
+                // Переход в игру
+                DispatchQueue.main.async {
+                    self.onSuccess?()
+                }
+                
+            case .failure(let error):
+                self.showError(message: error.localizedDescription)
+            }
         }
+    }
+    
+    private func showError(message: String) {
+        let alert = UIAlertController(title: "Ошибка", message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
     }
 
     private func setupKeyboardHandling() {

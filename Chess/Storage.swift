@@ -43,4 +43,20 @@ class Storage {
 
     @UserDefaultWrapper(key: "isKeySoundEnabled", default: true)
     var isKeySoundEnabled: Bool
+    
+    @UserDefaultWrapper(key: "authToken", default: nil)
+    var authToken: String?
+    
+    @UserDefaultWrapper(key: "username", default: nil)
+    var username: String?
+    
+    // Statistics
+    @UserDefaultWrapper(key: "bestWinTime", default: nil)
+    var bestWinTime: TimeInterval?
+    
+    @UserDefaultWrapper(key: "totalWins", default: 0)
+    var totalWins: Int
+    
+    @UserDefaultWrapper(key: "totalLosses", default: 0)
+    var totalLosses: Int
 }
