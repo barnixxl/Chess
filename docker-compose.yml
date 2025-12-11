@@ -18,6 +18,8 @@ services:
       - .:/app
     env_file:
       - .env
+    networks: 
+      - chess-network
 
   db:
     image: postgres:15
@@ -32,6 +34,11 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:   
+      - chess-network
 
 volumes:
   postgres_data:
+
+networks:
+  chess-network:
