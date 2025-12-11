@@ -13,9 +13,16 @@ class LoginViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupPixelBackground()
-        setupStarAnimation()
         setupUI()
         setupKeyboardHandling()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        // Создаем звезды асинхронно после появления экрана для лучшей производительности
+        DispatchQueue.main.async { [weak self] in
+            self?.setupStarAnimation()
+        }
     }
 
     private func setupPixelBackground() {
@@ -28,12 +35,17 @@ class LoginViewController: UIViewController {
         ]
         gradientLayer.startPoint = CGPoint(x: 0, y: 0)
         gradientLayer.endPoint = CGPoint(x: 1, y: 1)
+        gradientLayer.shouldRasterize = true // Оптимизация производительности
+        gradientLayer.rasterizationScale = UIScreen.main.scale
         view.layer.insertSublayer(gradientLayer, at: 0)
     }
 
     private func setupStarAnimation() {
-        // Создаем пиксельные звезды
-        for i in 0 ..< 25 {
+        // Оптимизация: создаем меньше звезд и более эффективно
+        let starCount = 15 // Уменьшено с 25 для лучшей производительности
+        
+        var starViews: [UIView] = []
+        for i in 0 ..< starCount {
             let star = UIView()
             let size: CGFloat = [4, 6, 8].randomElement()!
             star.frame = CGRect(
@@ -44,14 +56,28 @@ class LoginViewController: UIViewController {
             )
             star.backgroundColor = .white
             star.alpha = CGFloat.random(in: 0.3 ... 1.0)
-            view.addSubview(star)
+            star.layer.shouldRasterize = true
+            star.layer.rasterizationScale = UIScreen.main.scale
+            starViews.append(star)
             stars.append(star)
-
-            let duration = Double.random(in: 1.0 ... 3.0)
-            let delay = Double(i) * 0.1
-            UIView.animate(withDuration: duration, delay: delay, options: [.repeat, .autoreverse], animations: {
-                star.alpha = CGFloat.random(in: 0.2 ... 1.0)
-            }, completion: nil)
+        }
+        
+        // Добавляем все звезды одним пакетом
+        for star in starViews {
+            view.addSubview(star)
+        }
+        
+        // Запускаем анимации с задержкой
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+            guard let self = self else { return }
+            for (i, star) in starViews.enumerated() {
+                let duration = Double.random(in: 1.5 ... 3.0)
+                let delay = Double(i) * 0.05
+                
+                UIView.animate(withDuration: duration, delay: delay, options: [.repeat, .autoreverse, .curveEaseInOut], animations: {
+                    star.alpha = CGFloat.random(in: 0.2 ... 1.0)
+                }, completion: nil)
+            }
         }
     }
 
@@ -96,15 +122,21 @@ class LoginViewController: UIViewController {
         nameTextfield.layer.cornerRadius = 0
         nameTextfield.layer.borderWidth = 3
         nameTextfield.layer.borderColor = UIColor(red: 0.4, green: 0.6, blue: 0.9, alpha: 1.0).cgColor
+        nameTextfield.layer.shouldRasterize = true // Оптимизация
+        nameTextfield.layer.rasterizationScale = UIScreen.main.scale
         nameTextfield.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 15, height: 0))
         nameTextfield.leftViewMode = .always
         nameTextfield.autocapitalizationType = .none
         nameTextfield.autocorrectionType = .no
-        nameTextfield.keyboardType = .emailAddress
+        nameTextfield.spellCheckingType = .no // Отключаем проверку орфографии
+        nameTextfield.smartQuotesType = .no
+        nameTextfield.smartDashesType = .no
+        nameTextfield.smartInsertDeleteType = .no
+        nameTextfield.keyboardType = .default
         nameTextfield.returnKeyType = .next
         nameTextfield.delegate = self
         nameTextfield.translatesAutoresizingMaskIntoConstraints = false
-        // Изменяем цвет placeholder
+        // Изменяем цвет placeholder (упрощенная версия)
         nameTextfield.attributedPlaceholder = NSAttributedString(
             string: "ИМЯ ПОЛЬЗОВАТЕЛЯ",
             attributes: [NSAttributedString.Key.foregroundColor: UIColor.white.withAlphaComponent(0.5)]
@@ -119,9 +151,17 @@ class LoginViewController: UIViewController {
         passwordTextField.layer.cornerRadius = 0
         passwordTextField.layer.borderWidth = 3
         passwordTextField.layer.borderColor = UIColor(red: 0.4, green: 0.6, blue: 0.9, alpha: 1.0).cgColor
+        passwordTextField.layer.shouldRasterize = true // Оптимизация
+        passwordTextField.layer.rasterizationScale = UIScreen.main.scale
         passwordTextField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 15, height: 0))
         passwordTextField.leftViewMode = .always
         passwordTextField.isSecureTextEntry = true
+        passwordTextField.autocapitalizationType = .none
+        passwordTextField.autocorrectionType = .no
+        passwordTextField.spellCheckingType = .no
+        passwordTextField.smartQuotesType = .no
+        passwordTextField.smartDashesType = .no
+        passwordTextField.smartInsertDeleteType = .no
         passwordTextField.returnKeyType = .done
         passwordTextField.delegate = self
         passwordTextField.translatesAutoresizingMaskIntoConstraints = false

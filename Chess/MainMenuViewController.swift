@@ -8,8 +8,15 @@ class MainMenuViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupPixelBackground()
-        setupStarAnimation()
         setupUI()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        // Создаем звезды асинхронно после появления экрана для лучшей производительности
+        DispatchQueue.main.async { [weak self] in
+            self?.setupStarAnimation()
+        }
     }
     
     private func setupPixelBackground() {
@@ -24,12 +31,18 @@ class MainMenuViewController: UIViewController {
         gradientLayer.locations = [0.0, 0.5, 1.0]
         gradientLayer.startPoint = CGPoint(x: 0, y: 0)
         gradientLayer.endPoint = CGPoint(x: 1, y: 1)
+        gradientLayer.shouldRasterize = true // Оптимизация производительности
+        gradientLayer.rasterizationScale = UIScreen.main.scale
         view.layer.insertSublayer(gradientLayer, at: 0)
     }
 
     private func setupStarAnimation() {
-        // Создаем пиксельные звезды на фоне
-        for i in 0 ..< 30 {
+        // Оптимизация: создаем меньше звезд и более эффективно
+        let starCount = 20 // Уменьшено с 30 для лучшей производительности
+        
+        // Создаем все звезды сразу для уменьшения количества операций добавления в view
+        var starViews: [UIView] = []
+        for i in 0 ..< starCount {
             let star = UIView()
             let size: CGFloat = [4, 6, 8].randomElement()!
             star.frame = CGRect(
@@ -40,16 +53,28 @@ class MainMenuViewController: UIViewController {
             )
             star.backgroundColor = .white
             star.alpha = CGFloat.random(in: 0.3 ... 1.0)
-            view.addSubview(star)
+            star.layer.shouldRasterize = true // Оптимизация рендеринга
+            star.layer.rasterizationScale = UIScreen.main.scale
+            starViews.append(star)
             stars.append(star)
-            
-            // Мерцание звезд
-            let duration = Double.random(in: 1.0 ... 3.0)
-            let delay = Double(i) * 0.1
-            
-            UIView.animate(withDuration: duration, delay: delay, options: [.repeat, .autoreverse], animations: {
-                star.alpha = CGFloat.random(in: 0.2 ... 1.0)
-            }, completion: nil)
+        }
+        
+        // Добавляем все звезды одним пакетом
+        for star in starViews {
+            view.addSubview(star)
+        }
+        
+        // Запускаем анимации с задержкой для плавности
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+            guard let self = self else { return }
+            for (i, star) in starViews.enumerated() {
+                let duration = Double.random(in: 1.5 ... 3.0)
+                let delay = Double(i) * 0.05 // Уменьшена задержка
+                
+                UIView.animate(withDuration: duration, delay: delay, options: [.repeat, .autoreverse, .curveEaseInOut], animations: {
+                    star.alpha = CGFloat.random(in: 0.2 ... 1.0)
+                }, completion: nil)
+            }
         }
     }
     

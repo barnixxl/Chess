@@ -4,7 +4,6 @@ import UIKit
 class ViewController: UIViewController {
     private var game: Game = .init()
     private var isPaused: Bool = false
-    private var gameStartTime: Date?
 
     @IBOutlet var boardView: BoardView?
     @IBOutlet var undoButton: UIButton?
@@ -30,9 +29,6 @@ class ViewController: UIViewController {
         blackToggle?.selectedSegmentIndex = game.blackIsHuman ? 0 : 1
         boardView?.board = game.board
         isPaused = game.inProgress
-        if !game.inProgress {
-            gameStartTime = Date()
-        }
         updateUI()
         update()
 
@@ -79,7 +75,6 @@ class ViewController: UIViewController {
 
     @IBAction private func resetGame() {
         game.reset()
-        gameStartTime = Date()
         UIView.animate(withDuration: 0.4, animations: {
             self.boardView?.board = self.game.board
             self.updateUI()
@@ -177,8 +172,6 @@ private extension ViewController {
                 message = "Insufficient material: Nobody wins"
             case .checkMate:
                 message = "Checkmate: \(game.turn.other) wins"
-                // Сохраняем статистику только если игра была завершена
-                saveGameStatistics(winner: game.turn.other)
             case .check, .idle:
                 preconditionFailure()
             }
@@ -198,40 +191,6 @@ private extension ViewController {
         }
     }
     
-    private func saveGameStatistics(winner: Color) {
-        // Определяем, выиграл ли игрок-человек
-        let humanWon: Bool
-        if winner == .white {
-            humanWon = game.whiteIsHuman
-        } else {
-            humanWon = game.blackIsHuman
-        }
-        
-        // Сохраняем победу или поражение
-        if humanWon {
-            Storage.shared.totalWins += 1
-            
-            // Обновляем лучшее время выигрыша, если есть
-            if let startTime = gameStartTime {
-                let gameDuration = Date().timeIntervalSince(startTime)
-                if let currentBest = Storage.shared.bestWinTime {
-                    if gameDuration < currentBest {
-                        Storage.shared.bestWinTime = gameDuration
-                    }
-                } else {
-                    Storage.shared.bestWinTime = gameDuration
-                }
-            }
-        } else {
-            // Учитываем только если играл против компьютера (один из игроков - компьютер)
-            if !game.whiteIsHuman || !game.blackIsHuman {
-                Storage.shared.totalLosses += 1
-            }
-        }
-        
-        // Сбрасываем время начала для следующей игры
-        gameStartTime = nil
-    }
 
     func pause() {
         isPaused = true
@@ -275,10 +234,6 @@ private extension ViewController {
     func makeMove(_ move: Move) {
         guard let boardView = boardView else {
             return
-        }
-        // Устанавливаем время начала игры при первом ходе
-        if gameStartTime == nil && !game.inProgress {
-            gameStartTime = Date()
         }
         let oldGame = game
         game.makeMove(move)

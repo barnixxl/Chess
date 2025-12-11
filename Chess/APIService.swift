@@ -61,6 +61,20 @@ struct TokenResponse: Codable {
     let token: String
 }
 
+// MARK: - Statistics
+
+struct StatisticsResponse: Codable {
+    let totalWins: Int
+    let totalLosses: Int
+    let bestWinTime: Double? // В секундах, может быть nil
+    
+    enum CodingKeys: String, CodingKey {
+        case totalWins = "total_wins"
+        case totalLosses = "total_losses"
+        case bestWinTime = "best_win_time"
+    }
+}
+
 class APIService {
     static let shared = APIService()
     
@@ -134,6 +148,27 @@ class APIService {
             completion(.failure(.decodingError))
             return
         }
+        
+        performRequest(request: request, completion: completion)
+    }
+    
+    // MARK: - Statistics
+    
+    func getStatistics(completion: @escaping (Result<StatisticsResponse, APIError>) -> Void) {
+        guard let token = Storage.shared.authToken else {
+            completion(.failure(.networkError("Требуется авторизация")))
+            return
+        }
+        
+        guard let url = URL(string: "\(baseURL)/api/statistics") else {
+            completion(.failure(.invalidURL))
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         
         performRequest(request: request, completion: completion)
     }

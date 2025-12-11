@@ -1,11 +1,56 @@
 import UIKit
 
 class StatisticsViewController: UIViewController {
+    private var statistics: StatisticsResponse?
+    private var loadingIndicator: UIActivityIndicatorView?
+    private var bestTimeValue: UILabel?
+    private var winsValue: UILabel?
+    private var lossesValue: UILabel?
+    private var ratioBar: UIView?
+    private var ratioValue: UILabel?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupPixelBackground()
-        setupUI()
+        loadStatistics()
+    }
+    
+    private func loadStatistics() {
+        // Показываем индикатор загрузки
+        let indicator = UIActivityIndicatorView(style: .large)
+        indicator.color = .white
+        indicator.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(indicator)
+        loadingIndicator = indicator
+        
+        NSLayoutConstraint.activate([
+            indicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            indicator.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+        ])
+        
+        indicator.startAnimating()
+        
+        // Загружаем статистику с бэка
+        APIService.shared.getStatistics { [weak self] result in
+            guard let self = self else { return }
+            
+            DispatchQueue.main.async {
+                self.loadingIndicator?.stopAnimating()
+                self.loadingIndicator?.removeFromSuperview()
+                self.loadingIndicator = nil
+                
+                switch result {
+                case .success(let stats):
+                    self.statistics = stats
+                    self.setupUI()
+                case .failure(let error):
+                    // В случае ошибки показываем UI с нулевыми значениями
+                    print("Ошибка загрузки статистики: \(error.localizedDescription)")
+                    self.statistics = StatisticsResponse(totalWins: 0, totalLosses: 0, bestWinTime: nil)
+                    self.setupUI()
+                }
+            }
+        }
     }
     
     private func setupPixelBackground() {
@@ -77,8 +122,8 @@ class StatisticsViewController: UIViewController {
         bestTimeCard.addSubview(bestTimeTitle)
         
         let bestTimeValue = createValueLabel()
-        let bestTime = Storage.shared.bestWinTime
-        if let time = bestTime {
+        self.bestTimeValue = bestTimeValue
+        if let time = statistics?.bestWinTime {
             let minutes = Int(time) / 60
             let seconds = Int(time) % 60
             bestTimeValue.text = String(format: "%02d:%02d", minutes, seconds)
@@ -96,14 +141,16 @@ class StatisticsViewController: UIViewController {
         winsLossesCard.addSubview(winsLabel)
         
         let winsValue = createValueLabel()
-        winsValue.text = "\(Storage.shared.totalWins)"
+        self.winsValue = winsValue
+        winsValue.text = "\(statistics?.totalWins ?? 0)"
         winsLossesCard.addSubview(winsValue)
         
         let lossesLabel = createSectionLabel(text: "ПОРАЖЕНИЯ")
         winsLossesCard.addSubview(lossesLabel)
         
         let lossesValue = createValueLabel()
-        lossesValue.text = "\(Storage.shared.totalLosses)"
+        self.lossesValue = lossesValue
+        lossesValue.text = "\(statistics?.totalLosses ?? 0)"
         lossesValue.textColor = UIColor(red: 1.0, green: 0.5, blue: 0.5, alpha: 1.0)
         winsLossesCard.addSubview(lossesValue)
         
@@ -115,12 +162,14 @@ class StatisticsViewController: UIViewController {
         ratioCard.addSubview(ratioTitle)
         
         let ratioBar = createRatioBar()
+        self.ratioBar = ratioBar
         ratioCard.addSubview(ratioBar)
         
         let ratioValue = createValueLabel()
-        let total = Storage.shared.totalWins + Storage.shared.totalLosses
+        self.ratioValue = ratioValue
+        let total = (statistics?.totalWins ?? 0) + (statistics?.totalLosses ?? 0)
         if total > 0 {
-            let winPercentage = Double(Storage.shared.totalWins) / Double(total) * 100
+            let winPercentage = Double(statistics?.totalWins ?? 0) / Double(total) * 100
             ratioValue.text = String(format: "%.1f%%", winPercentage)
         } else {
             ratioValue.text = "0%"
@@ -241,8 +290,8 @@ class StatisticsViewController: UIViewController {
         container.layer.borderWidth = 2
         container.layer.borderColor = UIColor.black.cgColor
         
-        let total = Storage.shared.totalWins + Storage.shared.totalLosses
-        let winPercentage: CGFloat = total > 0 ? CGFloat(Storage.shared.totalWins) / CGFloat(total) : 0.0
+        let total = (statistics?.totalWins ?? 0) + (statistics?.totalLosses ?? 0)
+        let winPercentage: CGFloat = total > 0 ? CGFloat(statistics?.totalWins ?? 0) / CGFloat(total) : 0.0
         
         // Green (wins) portion
         let winsBar = UIView()
