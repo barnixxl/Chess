@@ -1,7 +1,10 @@
 import uvicorn
 from fastapi import FastAPI
 from starlette.responses import RedirectResponse
-from auth.view import router as auth_router
+from account import router as account_router
+from auth import router as auth_router
+from game import router as game_router
+from ranking import router as ranking_router
 from conn import init_db 
 from contextlib import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
@@ -20,6 +23,9 @@ app = FastAPI(
 )
 
 app.include_router(auth_router)
+app.include_router(game_router)
+app.include_router(ranking_router)
+app.include_router(account_router)
 
 app.add_middleware(
     CORSMiddleware,

@@ -13,6 +13,27 @@ async def init_db():
             );
         """)
 
+        await conn.execute("""
+            CREATE TABLE IF NOT EXISTS Games (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER REFERENCES Users(id) ON DELETE CASCADE,
+            result VARCHAR(10) NOT NULL,
+            dt TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+            win_time INTEGER
+            );"""
+        )
+
+        await conn.execute(
+            """
+                CREATE TABLE IF NOT EXISTS Rankings (
+                user_id INTEGER PRIMARY KEY REFERENCES Users(id) ON DELETE CASCADE,
+                rating INTEGER NOT NULL DEFAULT 1000,
+                best_win_time INTEGER 
+            );
+            """
+        )
+
+
 @asynccontextmanager
 async def get_db_connection():
     conn: asyncpg.Connection = await asyncpg.connect(
