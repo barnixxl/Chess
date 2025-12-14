@@ -2,7 +2,6 @@
 import UIKit
 
 class MainMenuViewController: UIViewController {
-    private var stars: [UIView] = []
     private var pixelParticles: [UIView] = []
 
     override func viewDidLoad() {
@@ -15,7 +14,7 @@ class MainMenuViewController: UIViewController {
         super.viewDidAppear(animated)
         // Создаем звезды асинхронно после появления экрана для лучшей производительности
         DispatchQueue.main.async { [weak self] in
-            self?.setupStarAnimation()
+            // Stars removed
         }
     }
     
@@ -36,52 +35,12 @@ class MainMenuViewController: UIViewController {
         view.layer.insertSublayer(gradientLayer, at: 0)
     }
 
-    private func setupStarAnimation() {
-        // Оптимизация: создаем меньше звезд и более эффективно
-        let starCount = 20 // Уменьшено с 30 для лучшей производительности
-        
-        // Создаем все звезды сразу для уменьшения количества операций добавления в view
-        var starViews: [UIView] = []
-        for i in 0 ..< starCount {
-            let star = UIView()
-            let size: CGFloat = [4, 6, 8].randomElement()!
-            star.frame = CGRect(
-                x: CGFloat.random(in: 0 ... view.bounds.width),
-                y: CGFloat.random(in: 0 ... view.bounds.height),
-                width: size,
-                height: size
-            )
-            star.backgroundColor = .white
-            star.alpha = CGFloat.random(in: 0.3 ... 1.0)
-            star.layer.shouldRasterize = true // Оптимизация рендеринга
-            star.layer.rasterizationScale = UIScreen.main.scale
-            starViews.append(star)
-            stars.append(star)
-        }
-        
-        // Добавляем все звезды одним пакетом
-        for star in starViews {
-            view.addSubview(star)
-        }
-        
-        // Запускаем анимации с задержкой для плавности
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
-            guard let self = self else { return }
-            for (i, star) in starViews.enumerated() {
-                let duration = Double.random(in: 1.5 ... 3.0)
-                let delay = Double(i) * 0.05 // Уменьшена задержка
-                
-                UIView.animate(withDuration: duration, delay: delay, options: [.repeat, .autoreverse, .curveEaseInOut], animations: {
-                    star.alpha = CGFloat.random(in: 0.2 ... 1.0)
-                }, completion: nil)
-            }
-        }
-    }
+    // Star animation function removed
     
     private func setupUI() {
         // Заголовок в стиле пиксельной игры
         let titleLabel = UILabel()
-        titleLabel.text = "MCP CHESS"
+        titleLabel.text = "MCB CHESS"
         titleLabel.font = UIFont.monospacedSystemFont(ofSize: 56, weight: .black)
         titleLabel.textColor = UIColor(red: 1.0, green: 0.9, blue: 0.3, alpha: 1.0)
         titleLabel.textAlignment = .center
@@ -100,10 +59,18 @@ class MainMenuViewController: UIViewController {
         chessIcon.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(chessIcon)
 
-        // Большая кнопка игры с компьютером по центру
+        // Большая кнопка игры с компьютером по центру с иконкой
         let playButton = createPixelButton(title: "ИГРА С КОМПЬЮТЕРОМ", color: UIColor(red: 0.9, green: 0.7, blue: 0.3, alpha: 1.0))
         playButton.addTarget(self, action: #selector(playTapped), for: .touchUpInside)
         playButton.translatesAutoresizingMaskIntoConstraints = false
+        
+        // Add chess icon to play button
+        if let playIcon = UIImage(named: "play_icon") {
+            playButton.setImage(playIcon, for: .normal)
+            playButton.imageView?.contentMode = .scaleAspectFit
+            playButton.titleEdgeInsets = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 0)
+            playButton.imageEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 10)
+        }
         view.addSubview(playButton)
 
         // Маленькие иконки внизу
@@ -115,17 +82,30 @@ class MainMenuViewController: UIViewController {
         bottomIconsStack.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(bottomIconsStack)
 
-        let iconsData: [(icon: String, color: UIColor, action: Selector)] = [
-            ("🏆", UIColor(red: 0.9, green: 0.7, blue: 0.3, alpha: 1.0), #selector(leaderboardTapped)),
-            ("⚙️", UIColor(red: 0.5, green: 0.5, blue: 0.5, alpha: 1.0), #selector(accountSettingsTapped)),
-            ("📊", UIColor(red: 0.4, green: 0.6, blue: 0.5, alpha: 1.0), #selector(statisticsTapped))
-        ]
-
-        for data in iconsData {
-            let button = createIconButton(icon: data.icon, color: data.color)
-            button.addTarget(self, action: data.action, for: .touchUpInside)
-            bottomIconsStack.addArrangedSubview(button)
-        }
+        // Create beautiful icon buttons with chess symbols and images
+        let leaderboardButton = createEnhancedIconButton(
+            imageName: "leaderboard_icon",
+            fallbackSymbol: "♔",
+            color: UIColor(red: 0.9, green: 0.7, blue: 0.3, alpha: 1.0)
+        )
+        leaderboardButton.addTarget(self, action: #selector(leaderboardTapped), for: .touchUpInside)
+        bottomIconsStack.addArrangedSubview(leaderboardButton)
+        
+        let settingsButton = createEnhancedIconButton(
+            imageName: nil,
+            fallbackSymbol: "♟",
+            color: UIColor(red: 0.6, green: 0.6, blue: 0.7, alpha: 1.0)
+        )
+        settingsButton.addTarget(self, action: #selector(accountSettingsTapped), for: .touchUpInside)
+        bottomIconsStack.addArrangedSubview(settingsButton)
+        
+        let statisticsButton = createEnhancedIconButton(
+            imageName: nil,
+            fallbackSymbol: "♜",
+            color: UIColor(red: 0.4, green: 0.7, blue: 0.6, alpha: 1.0)
+        )
+        statisticsButton.addTarget(self, action: #selector(statisticsTapped), for: .touchUpInside)
+        bottomIconsStack.addArrangedSubview(statisticsButton)
 
         NSLayoutConstraint.activate([
             titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
@@ -146,12 +126,22 @@ class MainMenuViewController: UIViewController {
         ])
     }
     
-    private func createIconButton(icon: String, color: UIColor) -> UIButton {
+    private func createEnhancedIconButton(imageName: String?, fallbackSymbol: String, color: UIColor) -> UIButton {
         let button = UIButton(type: .system)
-        button.setTitle(icon, for: .normal)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 36)
+        
+        // Try to use image first, fallback to chess symbol
+        if let imageName = imageName, let image = UIImage(named: imageName) {
+            button.setImage(image, for: .normal)
+            button.imageView?.contentMode = .scaleAspectFit
+            button.tintColor = .white
+        } else {
+            button.setTitle(fallbackSymbol, for: .normal)
+            button.titleLabel?.font = UIFont.systemFont(ofSize: 40)
+            button.setTitleColor(.white, for: .normal)
+        }
+        
         button.backgroundColor = color
-        button.layer.cornerRadius = 0
+        button.layer.cornerRadius = 8
         button.layer.borderWidth = 4
         button.layer.borderColor = UIColor.black.cgColor
         button.layer.shadowColor = UIColor.black.cgColor
@@ -202,6 +192,7 @@ class MainMenuViewController: UIViewController {
     }
 
     @objc private func accountSettingsTapped() {
+        SoundManager.shared.playButtonSound()
         let settingsVC = SettingsViewController()
         settingsVC.modalPresentationStyle = .fullScreen
         settingsVC.modalTransitionStyle = .crossDissolve
@@ -209,6 +200,7 @@ class MainMenuViewController: UIViewController {
     }
 
     @objc private func leaderboardTapped() {
+        SoundManager.shared.playButtonSound()
         let leaderboardVC = LeaderboardViewController()
         leaderboardVC.modalPresentationStyle = .fullScreen
         leaderboardVC.modalTransitionStyle = .crossDissolve
@@ -216,6 +208,7 @@ class MainMenuViewController: UIViewController {
     }
     
     @objc private func statisticsTapped() {
+        SoundManager.shared.playButtonSound()
         let statsVC = StatisticsViewController()
         statsVC.modalPresentationStyle = .fullScreen
         statsVC.modalTransitionStyle = .crossDissolve
@@ -223,6 +216,7 @@ class MainMenuViewController: UIViewController {
     }
     
     @objc private func playTapped() {
+        SoundManager.shared.playButtonSound()
         guard let windowScene = view.window?.windowScene,
               let delegate = windowScene.delegate as? SceneDelegate
         else {

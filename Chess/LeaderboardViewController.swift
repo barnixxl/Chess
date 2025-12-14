@@ -2,11 +2,14 @@ import UIKit
 
 class LeaderboardViewController: UIViewController {
     private var tableView: UITableView!
+    private var leaders: [LeaderboardEntry] = []
+    private var loadingIndicator: UIActivityIndicatorView?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupPixelBackground()
         setupUI()
+        loadLeaderboard()
     }
     
     private func setupPixelBackground() {
@@ -22,27 +25,58 @@ class LeaderboardViewController: UIViewController {
         gradientLayer.endPoint = CGPoint(x: 1, y: 1)
         view.layer.insertSublayer(gradientLayer, at: 0)
         
-        // Add stars
-        for _ in 0 ..< 20 {
-            let star = UIView()
-            let size: CGFloat = [4, 6].randomElement()!
-            star.frame = CGRect(
-                x: CGFloat.random(in: 0 ... view.bounds.width),
-                y: CGFloat.random(in: 0 ... view.bounds.height),
-                width: size,
-                height: size
-            )
-            star.backgroundColor = .white
-            star.alpha = CGFloat.random(in: 0.3 ... 0.8)
-            view.addSubview(star)
+        // Stars removed per user request
+    }
+    
+    
+    private func loadLeaderboard() {
+        // Show loading indicator
+        let indicator = UIActivityIndicatorView(style: .large)
+        indicator.color = .white
+        indicator.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(indicator)
+        loadingIndicator = indicator
+        
+        NSLayoutConstraint.activate([
+            indicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            indicator.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+        ])
+        
+        indicator.startAnimating()
+        
+        // Load leaderboard from API
+        APIService.shared.getLeaderboard { [weak self] result in
+            guard let self = self else { return }
+            
+            DispatchQueue.main.async {
+                self.loadingIndicator?.stopAnimating()
+                self.loadingIndicator?.removeFromSuperview()
+                self.loadingIndicator = nil
+                
+                switch result {
+                case .success(let response):
+                    self.leaders = response.leaders
+                    self.tableView.reloadData()
+                case .failure(let error):
+                    print("❌ Ошибка загрузки лидерборда: \(error.localizedDescription)")
+                    // Показываем алерт только если это не 404 (может быть просто нет данных)
+                    if case .serverError(let code, _) = error, code == 404 {
+                        print("⚠️ Лидерборд не найден (404), показываем пустую таблицу")
+                        self.leaders = []
+                        self.tableView.reloadData()
+                    } else {
+                        self.showErrorAlert(error: error)
+                    }
+                }
+            }
         }
     }
     
     private func setupUI() {
         // Title
         let titleLabel = UILabel()
-        titleLabel.text = "ТАБЛИЦА ЛИДЕРОВ"
-        titleLabel.font = UIFont.monospacedSystemFont(ofSize: 42, weight: .black)
+        titleLabel.text = "LEADERBOARD"
+        titleLabel.font = UIFont.monospacedSystemFont(ofSize: 32, weight: .black)
         titleLabel.textColor = UIColor(red: 1.0, green: 0.9, blue: 0.3, alpha: 1.0)
         titleLabel.textAlignment = .center
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -120,7 +154,18 @@ class LeaderboardViewController: UIViewController {
         }
     }
     
+    private func showErrorAlert(error: APIError) {
+        let alert = UIAlertController(
+            title: "Ошибка загрузки",
+            message: error.localizedDescription,
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
+    }
+    
     @objc private func backTapped() {
+        SoundManager.shared.playButtonSound()
         dismiss(animated: true, completion: nil)
     }
     
@@ -135,15 +180,13 @@ class LeaderboardViewController: UIViewController {
 // MARK: - UITableViewDataSource & Delegate
 extension LeaderboardViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // TODO: Replace with actual data from database
-        // For now, return 0 or placeholder data
-        return 0
+        return leaders.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "LeaderboardCell", for: indexPath) as! LeaderboardCell
-        // TODO: Configure cell with actual data
-        // cell.configure(rank: indexPath.row + 1, username: "Player", score: 1000)
+        let leader = leaders[indexPath.row]
+        cell.configure(rank: leader.rank, username: leader.username, score: leader.wins)
         return cell
     }
     
@@ -155,6 +198,7 @@ extension LeaderboardViewController: UITableViewDataSource, UITableViewDelegate 
 // MARK: - Leaderboard Cell
 class LeaderboardCell: UITableViewCell {
     private let rankLabel = UILabel()
+    private let medalLabel = UILabel()
     private let usernameLabel = UILabel()
     private let scoreLabel = UILabel()
     private let containerView = UIView()
@@ -178,15 +222,22 @@ class LeaderboardCell: UITableViewCell {
         containerView.layer.borderColor = UIColor.black.cgColor
         contentView.addSubview(containerView)
         
-        rankLabel.translatesAutoresizingMaskIntoConstraints = false
-        rankLabel.font = UIFont.monospacedSystemFont(ofSize: 24, weight: .bold)
-        rankLabel.textColor = UIColor(red: 1.0, green: 0.9, blue: 0.3, alpha: 1.0)
+        // Medal label for top 3
+        medalLabel.font = UIFont.systemFont(ofSize: 28)
+        medalLabel.textAlignment = .center
+        medalLabel.translatesAutoresizingMaskIntoConstraints = false
+        containerView.addSubview(medalLabel)
+        
+        rankLabel.font = UIFont.monospacedSystemFont(ofSize: 20, weight: .bold)
+        rankLabel.textColor = .white
         rankLabel.textAlignment = .center
+        rankLabel.translatesAutoresizingMaskIntoConstraints = false
         containerView.addSubview(rankLabel)
         
         usernameLabel.translatesAutoresizingMaskIntoConstraints = false
         usernameLabel.font = UIFont.monospacedSystemFont(ofSize: 18, weight: .medium)
         usernameLabel.textColor = .white
+        usernameLabel.textAlignment = .left // Align to left
         containerView.addSubview(usernameLabel)
         
         scoreLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -201,9 +252,13 @@ class LeaderboardCell: UITableViewCell {
             containerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             containerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -5),
             
-            rankLabel.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 15),
+            medalLabel.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
+            medalLabel.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 15),
+            medalLabel.widthAnchor.constraint(equalToConstant: 35),
+            
             rankLabel.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
-            rankLabel.widthAnchor.constraint(equalToConstant: 40),
+            rankLabel.leadingAnchor.constraint(equalTo: medalLabel.trailingAnchor, constant: 5),
+            rankLabel.widthAnchor.constraint(equalToConstant: 50),
             
             usernameLabel.leadingAnchor.constraint(equalTo: rankLabel.trailingAnchor, constant: 20),
             usernameLabel.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
@@ -214,8 +269,27 @@ class LeaderboardCell: UITableViewCell {
         ])
     }
     
+    
     func configure(rank: Int, username: String, score: Int) {
-        rankLabel.text = "#\(rank)"
+        // Show medal for top 3, otherwise show rank number
+        if rank == 1 {
+            medalLabel.text = "🥇"
+            rankLabel.text = ""
+            containerView.backgroundColor = UIColor(red: 1.0, green: 0.84, blue: 0.0, alpha: 0.3)
+        } else if rank == 2 {
+            medalLabel.text = "🥈"
+            rankLabel.text = ""
+            containerView.backgroundColor = UIColor(red: 0.75, green: 0.75, blue: 0.75, alpha: 0.3)
+        } else if rank == 3 {
+            medalLabel.text = "🥉"
+            rankLabel.text = ""
+            containerView.backgroundColor = UIColor(red: 0.8, green: 0.5, blue: 0.2, alpha: 0.3)
+        } else {
+            medalLabel.text = ""
+            rankLabel.text = "#\(rank)"
+            containerView.backgroundColor = UIColor(white: 0.2, alpha: 0.6)
+        }
+        
         usernameLabel.text = username
         scoreLabel.text = "\(score)"
     }

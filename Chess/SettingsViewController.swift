@@ -1,6 +1,7 @@
 import UIKit
 
 class SettingsViewController: UIViewController {
+    var isGameActive: Bool = false
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -21,20 +22,7 @@ class SettingsViewController: UIViewController {
         gradientLayer.endPoint = CGPoint(x: 1, y: 1)
         view.layer.insertSublayer(gradientLayer, at: 0)
         
-        // Add stars
-        for _ in 0 ..< 20 {
-            let star = UIView()
-            let size: CGFloat = [4, 6].randomElement()!
-            star.frame = CGRect(
-                x: CGFloat.random(in: 0 ... view.bounds.width),
-                y: CGFloat.random(in: 0 ... view.bounds.height),
-                width: size,
-                height: size
-            )
-            star.backgroundColor = .white
-            star.alpha = CGFloat.random(in: 0.3 ... 0.8)
-            view.addSubview(star)
-        }
+        // Stars removed per user request
     }
 
     private func setupUI() {
@@ -90,21 +78,44 @@ class SettingsViewController: UIViewController {
         let loseSoundRow = createToggleRow(title: "ПРОИГРЫШ", isOn: Storage.shared.isLoseSoundEnabled, selector: #selector(loseSoundToggled(_:)))
         contentView.addSubview(loseSoundRow)
         
-        let keySoundRow = createToggleRow(title: "НАЖАТИЕ КЛАВИШ", isOn: Storage.shared.isKeySoundEnabled, selector: #selector(keySoundToggled(_:)))
+        let keySoundRow = createToggleRow(title: "НАЖАТИЕ КНОПОК", isOn: Storage.shared.isKeySoundEnabled, selector: #selector(keySoundToggled(_:)))
         contentView.addSubview(keySoundRow)
 
-        // --- Account Section ---
-        let accountLabel = createSectionHeader(text: "АККАУНТ")
-        contentView.addSubview(accountLabel)
-
-        let accountButton = createPixelButton(title: "НАСТРОЙКИ АККАУНТА", color: UIColor(red: 0.4, green: 0.6, blue: 0.8, alpha: 1.0))
-        accountButton.addTarget(self, action: #selector(accountSettingsTapped), for: .touchUpInside)
-        contentView.addSubview(accountButton)
-
         // --- Back Button ---
-        let backButton = createPixelButton(title: "НАЗАД В МЕНЮ", color: UIColor(red: 0.8, green: 0.3, blue: 0.3, alpha: 1.0))
+        let backTitle = isGameActive ? "ВЕРНУТЬСЯ К ИГРЕ" : "НАЗАД В МЕНЮ"
+        let backButton = createPixelButton(title: backTitle, color: UIColor(red: 0.8, green: 0.3, blue: 0.3, alpha: 1.0))
         backButton.addTarget(self, action: #selector(backTapped), for: .touchUpInside)
         contentView.addSubview(backButton)
+
+        if !isGameActive {
+            let accountLabel = createSectionHeader(text: "АККАУНТ")
+            contentView.addSubview(accountLabel)
+
+            let accountButton = createPixelButton(title: "НАСТРОЙКИ АККАУНТА", color: UIColor(red: 0.4, green: 0.6, blue: 0.8, alpha: 1.0))
+            accountButton.addTarget(self, action: #selector(accountSettingsTapped), for: .touchUpInside)
+            contentView.addSubview(accountButton)
+            
+            // Constraints for Account Section
+             NSLayoutConstraint.activate([
+                accountLabel.topAnchor.constraint(equalTo: keySoundRow.bottomAnchor, constant: 40),
+                accountLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
+                
+                accountButton.topAnchor.constraint(equalTo: accountLabel.bottomAnchor, constant: 20),
+                accountButton.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+                accountButton.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: 0.8),
+                accountButton.heightAnchor.constraint(equalToConstant: 50),
+            ])
+            
+            // Connect back button to account button
+            NSLayoutConstraint.activate([
+                backButton.topAnchor.constraint(equalTo: accountButton.bottomAnchor, constant: 40)
+            ])
+        } else {
+            // If game is active, skip account section and connect back button to keySoundRow
+             NSLayoutConstraint.activate([
+                backButton.topAnchor.constraint(equalTo: keySoundRow.bottomAnchor, constant: 40)
+            ])
+        }
 
         // Constraints
         NSLayoutConstraint.activate([
@@ -157,15 +168,16 @@ class SettingsViewController: UIViewController {
             keySoundRow.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
             keySoundRow.heightAnchor.constraint(equalToConstant: 40),
             
-            accountLabel.topAnchor.constraint(equalTo: keySoundRow.bottomAnchor, constant: 40),
-            accountLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
+            // accountLabel.topAnchor.constraint(equalTo: keySoundRow.bottomAnchor, constant: 40),
+            // accountLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
             
-            accountButton.topAnchor.constraint(equalTo: accountLabel.bottomAnchor, constant: 20),
-            accountButton.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-            accountButton.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: 0.8),
-            accountButton.heightAnchor.constraint(equalToConstant: 50),
+            // accountButton.topAnchor.constraint(equalTo: accountLabel.bottomAnchor, constant: 20),
+            // accountButton.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+            // accountButton.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: 0.8),
+            // accountButton.heightAnchor.constraint(equalToConstant: 50),
             
-            backButton.topAnchor.constraint(equalTo: accountButton.bottomAnchor, constant: 40),
+            // See above for dynamic constraints
+            // backButton.topAnchor.constraint(equalTo: accountButton.bottomAnchor, constant: 40),
             backButton.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             backButton.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: 0.8),
             backButton.heightAnchor.constraint(equalToConstant: 50),
@@ -240,7 +252,7 @@ class SettingsViewController: UIViewController {
 
     @objc private func musicVolumeChanged(_ sender: UISlider) {
         Storage.shared.backgroundMusicVolume = sender.value
-        // TODO: Update actual music volume
+        SoundManager.shared.setBackgroundMusicVolume(sender.value)
     }
     
     @objc private func moveSoundToggled(_ sender: UISwitch) {
@@ -264,6 +276,7 @@ class SettingsViewController: UIViewController {
     }
 
     @objc private func accountSettingsTapped() {
+        SoundManager.shared.playButtonSound()
         let accountVC = AccountSettingsViewController()
         accountVC.modalPresentationStyle = .overFullScreen
         accountVC.modalTransitionStyle = .crossDissolve
@@ -271,6 +284,7 @@ class SettingsViewController: UIViewController {
     }
 
     @objc private func backTapped() {
+        SoundManager.shared.playButtonSound()
         dismiss(animated: true, completion: nil)
     }
     

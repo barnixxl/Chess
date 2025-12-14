@@ -45,8 +45,14 @@ class StatisticsViewController: UIViewController {
                     self.setupUI()
                 case .failure(let error):
                     // В случае ошибки показываем UI с нулевыми значениями
-                    print("Ошибка загрузки статистики: \(error.localizedDescription)")
-                    self.statistics = StatisticsResponse(totalWins: 0, totalLosses: 0, bestWinTime: nil)
+                    print("❌ Ошибка загрузки статистики: \(error.localizedDescription)")
+                    // Показываем алерт только если это не 404 (может быть просто нет данных)
+                    if case .serverError(let code, _) = error, code == 404 {
+                        print("⚠️ Статистика не найдена (404), показываем нулевые значения")
+                    } else {
+                        self.showErrorAlert(error: error)
+                    }
+                    self.statistics = StatisticsResponse(totalWins: 0, totalLosses: 0, totalDraws: nil, bestWinTime: nil, totalGames: nil, winRate: nil, averageGameTime: nil)
                     self.setupUI()
                 }
             }
@@ -133,7 +139,7 @@ class StatisticsViewController: UIViewController {
         }
         bestTimeCard.addSubview(bestTimeValue)
         
-        // Wins/Losses Card
+        // Unified Wins/Losses Card with Ratio Bar
         let winsLossesCard = createStatCard()
         contentView.addSubview(winsLossesCard)
         
@@ -154,16 +160,10 @@ class StatisticsViewController: UIViewController {
         lossesValue.textColor = UIColor(red: 1.0, green: 0.5, blue: 0.5, alpha: 1.0)
         winsLossesCard.addSubview(lossesValue)
         
-        // Win/Loss Ratio Bar
-        let ratioCard = createStatCard()
-        contentView.addSubview(ratioCard)
-        
-        let ratioTitle = createSectionLabel(text: "СООТНОШЕНИЕ ПОБЕД/ПОРАЖЕНИЙ")
-        ratioCard.addSubview(ratioTitle)
-        
+        // Percentage bar inside the same card
         let ratioBar = createRatioBar()
         self.ratioBar = ratioBar
-        ratioCard.addSubview(ratioBar)
+        winsLossesCard.addSubview(ratioBar)
         
         let ratioValue = createValueLabel()
         self.ratioValue = ratioValue
@@ -174,7 +174,9 @@ class StatisticsViewController: UIViewController {
         } else {
             ratioValue.text = "0%"
         }
-        ratioCard.addSubview(ratioValue)
+        ratioValue.font = UIFont.monospacedSystemFont(ofSize: 20, weight: .bold)
+        winsLossesCard.addSubview(ratioValue)
+
         
         // Back Button
         let backButton = createPixelButton(title: "НАЗАД", color: UIColor(red: 0.8, green: 0.3, blue: 0.3, alpha: 1.0))
@@ -210,10 +212,11 @@ class StatisticsViewController: UIViewController {
             bestTimeValue.topAnchor.constraint(equalTo: bestTimeTitle.bottomAnchor, constant: 15),
             bestTimeValue.centerXAnchor.constraint(equalTo: bestTimeCard.centerXAnchor),
             
+            
             winsLossesCard.topAnchor.constraint(equalTo: bestTimeCard.bottomAnchor, constant: 20),
             winsLossesCard.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
             winsLossesCard.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
-            winsLossesCard.heightAnchor.constraint(equalToConstant: 140),
+            winsLossesCard.heightAnchor.constraint(equalToConstant: 220),
             
             winsLabel.topAnchor.constraint(equalTo: winsLossesCard.topAnchor, constant: 15),
             winsLabel.leadingAnchor.constraint(equalTo: winsLossesCard.leadingAnchor, constant: 20),
@@ -224,26 +227,19 @@ class StatisticsViewController: UIViewController {
             lossesLabel.topAnchor.constraint(equalTo: winsLossesCard.topAnchor, constant: 15),
             lossesLabel.trailingAnchor.constraint(equalTo: winsLossesCard.trailingAnchor, constant: -20),
             
+            
             lossesValue.topAnchor.constraint(equalTo: lossesLabel.bottomAnchor, constant: 10),
             lossesValue.trailingAnchor.constraint(equalTo: winsLossesCard.trailingAnchor, constant: -20),
             
-            ratioCard.topAnchor.constraint(equalTo: winsLossesCard.bottomAnchor, constant: 20),
-            ratioCard.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
-            ratioCard.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
-            ratioCard.heightAnchor.constraint(equalToConstant: 160),
+            ratioBar.topAnchor.constraint(equalTo: winsValue.bottomAnchor, constant: 20),
+            ratioBar.leadingAnchor.constraint(equalTo: winsLossesCard.leadingAnchor, constant: 20),
+            ratioBar.trailingAnchor.constraint(equalTo: winsLossesCard.trailingAnchor, constant: -20),
+            ratioBar.heightAnchor.constraint(equalToConstant: 30),
             
-            ratioTitle.topAnchor.constraint(equalTo: ratioCard.topAnchor, constant: 15),
-            ratioTitle.centerXAnchor.constraint(equalTo: ratioCard.centerXAnchor),
+            ratioValue.topAnchor.constraint(equalTo: ratioBar.bottomAnchor, constant: 10),
+            ratioValue.centerXAnchor.constraint(equalTo: winsLossesCard.centerXAnchor),
             
-            ratioBar.topAnchor.constraint(equalTo: ratioTitle.bottomAnchor, constant: 20),
-            ratioBar.leadingAnchor.constraint(equalTo: ratioCard.leadingAnchor, constant: 20),
-            ratioBar.trailingAnchor.constraint(equalTo: ratioCard.trailingAnchor, constant: -20),
-            ratioBar.heightAnchor.constraint(equalToConstant: 40),
-            
-            ratioValue.topAnchor.constraint(equalTo: ratioBar.bottomAnchor, constant: 15),
-            ratioValue.centerXAnchor.constraint(equalTo: ratioCard.centerXAnchor),
-            
-            backButton.topAnchor.constraint(equalTo: ratioCard.bottomAnchor, constant: 30),
+            backButton.topAnchor.constraint(equalTo: winsLossesCard.bottomAnchor, constant: 30),
             backButton.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             backButton.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: 0.6),
             backButton.heightAnchor.constraint(equalToConstant: 50),
@@ -355,7 +351,18 @@ class StatisticsViewController: UIViewController {
         }
     }
     
+    private func showErrorAlert(error: APIError) {
+        let alert = UIAlertController(
+            title: "Ошибка загрузки",
+            message: error.localizedDescription,
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
+    }
+    
     @objc private func backTapped() {
+        SoundManager.shared.playButtonSound()
         dismiss(animated: true, completion: nil)
     }
     

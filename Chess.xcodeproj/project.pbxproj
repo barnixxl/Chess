@@ -20,6 +20,7 @@
 		01DD40AE2C41CE2000D63D2B /* GameTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01DD40AD2C41CE2000D63D2B /* GameTests.swift */; };
 		0E6FCBCB2BED015E00193845 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E6FCBCA2BED015E00193845 /* SettingsViewController.swift */; };
 		0E6FCBCD2BED202900193845 /* Storage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E6FCBCC2BED202900193845 /* Storage.swift */; };
+		451EC3CC2EEC3D8C00FBB6AE /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 451EC3CB2EEC3D8C00FBB6AE /* SettingsViewController.swift */; };
 		4521C7AC2ED644DC007E5B8F /* MainMenuViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4521C7AB2ED644DC007E5B8F /* MainMenuViewController.swift */; };
 		4550188E2ECE8C3500F38230 /* AuthViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4550188D2ECE8C3500F38230 /* AuthViewController.swift */; };
 		455018912ECE8C4000F38230 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4550188F2ECE8C4000F38230 /* LoginViewController.swift */; };
@@ -28,6 +29,7 @@
 		45AEA7112EE8532E0083F58E /* APIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45AEA7102EE8532E0083F58E /* APIService.swift */; };
 		45B1C8E32EE8533F0083F58E /* LeaderboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45B1C8E22EE8533F0083F58E /* LeaderboardViewController.swift */; };
 		45B1C8E42EE8533F0083F58F /* StatisticsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45B1C8E12EE8533F0083F58F /* StatisticsViewController.swift */; };
+		45C2D8E52EE8534F0084F69G /* SoundManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45C2D8E42EE8534F0084F69G /* SoundManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -57,14 +59,16 @@
 		01DD40AD2C41CE2000D63D2B /* GameTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameTests.swift; sourceTree = "<group>"; };
 		0E6FCBCA2BED015E00193845 /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
 		0E6FCBCC2BED202900193845 /* Storage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Storage.swift; sourceTree = "<group>"; };
+		451EC3CB2EEC3D8C00FBB6AE /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
 		4521C7AB2ED644DC007E5B8F /* MainMenuViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMenuViewController.swift; sourceTree = "<group>"; };
 		4550188D2ECE8C3500F38230 /* AuthViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewController.swift; sourceTree = "<group>"; };
 		4550188F2ECE8C4000F38230 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		455018902ECE8C4000F38230 /* RegisterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterViewController.swift; sourceTree = "<group>"; };
 		4566C8E12ED73E410053582C /* AccountSettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountSettingsViewController.swift; sourceTree = "<group>"; };
 		45AEA7102EE8532E0083F58E /* APIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIService.swift; sourceTree = "<group>"; };
-		45B1C8E22EE8533F0083F58E /* LeaderboardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeaderboardViewController.swift; sourceTree = "<group>"; };
 		45B1C8E12EE8533F0083F58F /* StatisticsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsViewController.swift; sourceTree = "<group>"; };
+		45B1C8E22EE8533F0083F58E /* LeaderboardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeaderboardViewController.swift; sourceTree = "<group>"; };
+		45C2D8E42EE8534F0084F69G /* SoundManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -122,7 +126,9 @@
 				01642A88251A882400039186 /* ViewController.swift */,
 				013499942904183F00CED6BE /* UIView+Jiggle.swift */,
 				0E6FCBCA2BED015E00193845 /* SettingsViewController.swift */,
+				451EC3CB2EEC3D8C00FBB6AE /* SettingsViewController.swift */,
 				0E6FCBCC2BED202900193845 /* Storage.swift */,
+				45C2D8E42EE8534F0084F69G /* SoundManager.swift */,
 				01642A8A251A882400039186 /* Main.storyboard */,
 				01642A8D251A882800039186 /* Assets.xcassets */,
 				01642A8F251A882800039186 /* LaunchScreen.storyboard */,
@@ -280,6 +286,8 @@
 				0E6FCBCB2BED015E00193845 /* SettingsViewController.swift in Sources */,
 				45B1C8E32EE8533F0083F58E /* LeaderboardViewController.swift in Sources */,
 				45B1C8E42EE8533F0083F58F /* StatisticsViewController.swift in Sources */,
+				451EC3CC2EEC3D8C00FBB6AE /* SettingsViewController.swift in Sources */,
+				45C2D8E52EE8534F0084F69G /* SoundManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

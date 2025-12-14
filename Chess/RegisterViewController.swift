@@ -277,10 +277,12 @@ class RegisterViewController: UIViewController {
     }
 
     @objc private func backTapped() {
+        SoundManager.shared.playButtonSound()
         dismiss(animated: true)
     }
 
     @objc private func confirmTapped() {
+        SoundManager.shared.playButtonSound()
         // Валидация полей
         guard let username = emailTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines), !username.isEmpty else {
             showError(message: "Введите имя пользователя")

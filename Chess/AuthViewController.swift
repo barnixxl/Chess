@@ -222,6 +222,7 @@ class AuthViewController: UIViewController {
     }
 
     @objc private func loginTapped() {
+        SoundManager.shared.playButtonSound()
         let loginVC = LoginViewController()
         loginVC.modalPresentationStyle = .fullScreen
         loginVC.onSuccess = { [weak self] in
@@ -233,6 +234,7 @@ class AuthViewController: UIViewController {
     }
 
     @objc private func registerTapped() {
+        SoundManager.shared.playButtonSound()
         let registerVC = RegisterViewController()
         registerVC.modalPresentationStyle = .fullScreen
         registerVC.onSuccess = { [weak self] in

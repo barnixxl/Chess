@@ -49,4 +49,13 @@ class Storage {
     
     @UserDefaultWrapper(key: "username", default: nil)
     var username: String?
+    
+    var savedGameStartTime: Date? {
+        get {
+            return UserDefaults.standard.object(forKey: "savedGameStartTime") as? Date
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: "savedGameStartTime")
+        }
+    }
 }
