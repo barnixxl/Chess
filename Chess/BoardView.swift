@@ -3,7 +3,11 @@ import UIKit
 
 private extension Piece {
     var imageName: String {
-        "\(type.rawValue)_\(color.rawValue)"
+        if type == .pawn {
+            let column = String(id.last ?? "0")
+            return "\(type.rawValue)_\(color.rawValue)_\(column)"
+        }
+        return "\(type.rawValue)_\(color.rawValue)"
     }
 }
 
