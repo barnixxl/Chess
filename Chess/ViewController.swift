@@ -8,10 +8,18 @@ class ViewController: UIViewController {
     private var gameResult: String? // "win", "loss", "draw"
 
     @IBOutlet var boardView: BoardView?
+    
+    // Legacy Storyboard Outlets (Required to prevent crash)
     @IBOutlet var undoButton: UIButton?
     @IBOutlet var resetButton: UIButton?
-    @IBOutlet var whiteToggle: UISegmentedControl? 
+    @IBOutlet var whiteToggle: UISegmentedControl?
     @IBOutlet var blackToggle: UISegmentedControl?
+
+    // UI Elements
+    private var modeButton: UIButton?
+    private var settingsButton: UIButton?
+    private var exitButton: UIButton?
+    private var restartButton: UIButton?
 
     private lazy var saveURL: URL = {
         var directory = FileManager.default
@@ -28,13 +36,18 @@ class ViewController: UIViewController {
         boardView?.delegate = self
         try? load(from: saveURL)
         
-        applyPixelStyle(to: undoButton)
-        applyPixelStyle(to: resetButton)
-        
-        // Fix for NSUnknownKeyException: restore outlet but hide usage
+        // Hide legacy UI from storyboard
+        undoButton?.isHidden = true
+        resetButton?.isHidden = true
         whiteToggle?.isHidden = true
+        blackToggle?.isHidden = true
+        
+        setupInGameUI()
+        
+        // Ensure game state matches UI
         game.whiteIsHuman = true 
-        blackToggle?.selectedSegmentIndex = game.blackIsHuman ? 0 : 1
+        // Sync mode button text with loaded game state
+        updateModeButtonText()
         
         boardView?.board = game.board
         isPaused = game.inProgress
@@ -47,46 +60,6 @@ class ViewController: UIViewController {
         updateUI()
         update()
         
-        // Re-create Settings Button programmatically
-        let settingsBtn = UIButton(type: .system)
-        settingsBtn.setTitle("⚙️", for: .normal)
-        settingsBtn.titleLabel?.font = UIFont.systemFont(ofSize: 24)
-        settingsBtn.setTitleColor(.white, for: .normal)
-        settingsBtn.backgroundColor = UIColor(white: 0.2, alpha: 0.8)
-        settingsBtn.layer.borderWidth = 2
-        settingsBtn.layer.borderColor = UIColor.white.cgColor
-        settingsBtn.layer.cornerRadius = 4
-        settingsBtn.translatesAutoresizingMaskIntoConstraints = false
-        settingsBtn.addTarget(self, action: #selector(settings), for: .touchUpInside)
-        view.addSubview(settingsBtn)
-        
-        NSLayoutConstraint.activate([
-            settingsBtn.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
-            settingsBtn.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -10),
-            settingsBtn.widthAnchor.constraint(equalToConstant: 40),
-            settingsBtn.heightAnchor.constraint(equalToConstant: 40)
-        ])
-
-        // Exit Button
-        let exitButton = UIButton(type: .system)
-        exitButton.setTitle("EXIT TO MENU", for: .normal)
-        exitButton.titleLabel?.font = UIFont.monospacedSystemFont(ofSize: 14, weight: .bold)
-        exitButton.setTitleColor(.white, for: .normal)
-        exitButton.backgroundColor = UIColor(white: 0.2, alpha: 0.8)
-        exitButton.layer.borderWidth = 2
-        exitButton.layer.borderColor = UIColor.white.cgColor
-        exitButton.layer.cornerRadius = 4
-        exitButton.translatesAutoresizingMaskIntoConstraints = false
-        exitButton.addTarget(self, action: #selector(exitTapped), for: .touchUpInside)
-        view.addSubview(exitButton)
-        
-        NSLayoutConstraint.activate([
-            exitButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            exitButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -10),
-            exitButton.heightAnchor.constraint(equalToConstant: 30),
-            exitButton.widthAnchor.constraint(equalToConstant: 120)
-        ])
-
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(didEnterBackground),
@@ -94,20 +67,129 @@ class ViewController: UIViewController {
             object: nil
         )
     }
+    
+    private func setupInGameUI() {
+        // 1. Settings Button (Top Right)
+        let settingsBtn = createPixelButton(
+            title: "НАСТРОЙКИ", 
+            color: UIColor(red: 0.6, green: 0.6, blue: 0.7, alpha: 1.0)
+        )
+        settingsBtn.addTarget(self, action: #selector(settings), for: .touchUpInside)
+        view.addSubview(settingsBtn)
+        self.settingsButton = settingsBtn
+        
+        // 2. Mode Toggle (Below Board)
+        let modeBtn = createPixelButton(
+            title: "ЧЕРНЫЕ: ИГРОК", // Initial text, will update
+            color: UIColor(red: 0.4, green: 0.7, blue: 0.9, alpha: 1.0)
+        )
+        modeBtn.addTarget(self, action: #selector(togglePlayerType), for: .touchUpInside)
+        view.addSubview(modeBtn)
+        self.modeButton = modeBtn
+        
+        // 3. Menu/Exit Button (Bottom Left)
+        let exitBtn = createPixelButton(
+            title: "МЕНЮ", 
+            color: UIColor(red: 0.8, green: 0.3, blue: 0.3, alpha: 1.0)
+        )
+        exitBtn.addTarget(self, action: #selector(exitTapped), for: .touchUpInside)
+        view.addSubview(exitBtn)
+        self.exitButton = exitBtn
+        
+        // 4. Restart Button (Bottom Right)
+        let restartBtn = createPixelButton(
+            title: "РЕСТАРТ", 
+            color: UIColor(red: 0.9, green: 0.7, blue: 0.3, alpha: 1.0)
+        )
+        restartBtn.addTarget(self, action: #selector(resetGame), for: .touchUpInside)
+        view.addSubview(restartBtn)
+        self.restartButton = restartBtn
+        
+        // --- Constraints ---
+        guard let boardView = boardView else { return }
+        
+        NSLayoutConstraint.activate([
+            // Settings: Top Right
+            settingsBtn.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
+            settingsBtn.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
+            settingsBtn.widthAnchor.constraint(equalToConstant: 140),
+            settingsBtn.heightAnchor.constraint(equalToConstant: 44),
+            
+            // Mode Toggle: Below Board, Centered
+            modeBtn.topAnchor.constraint(equalTo: boardView.bottomAnchor, constant: 20),
+            modeBtn.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            modeBtn.widthAnchor.constraint(equalToConstant: 240),
+            modeBtn.heightAnchor.constraint(equalToConstant: 50),
+            
+            // Exit: Bottom Left
+            exitBtn.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
+            exitBtn.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
+            exitBtn.widthAnchor.constraint(equalToConstant: 160),
+            exitBtn.heightAnchor.constraint(equalToConstant: 60),
+            
+            // Restart: Bottom Right
+            restartBtn.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
+            restartBtn.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
+            restartBtn.widthAnchor.constraint(equalToConstant: 160),
+            restartBtn.heightAnchor.constraint(equalToConstant: 60),
+        ])
+    }
+    
+    private func createPixelButton(title: String, color: UIColor) -> UIButton {
+        let button = UIButton(type: .system)
+        
+        button.setTitle(title, for: .normal)
+        button.titleLabel?.font = UIFont.monospacedSystemFont(ofSize: 18, weight: .black)
+        button.setTitleColor(.white, for: .normal)
+        
+        button.backgroundColor = color
+        button.layer.cornerRadius = 8
+        button.layer.borderWidth = 4
+        button.layer.borderColor = UIColor.black.cgColor
+        
+        // Pixel art style shadow
+        button.layer.shadowColor = UIColor.black.cgColor
+        button.layer.shadowOffset = CGSize(width: 4, height: 4)
+        button.layer.shadowRadius = 0
+        button.layer.shadowOpacity = 1.0
+
+        button.translatesAutoresizingMaskIntoConstraints = false
+        
+        button.addTarget(self, action: #selector(buttonPressed(_:)), for: .touchDown)
+        button.addTarget(self, action: #selector(buttonReleased(_:)), for: [.touchUpInside, .touchUpOutside, .touchCancel])
+
+        return button
+    }
+    
+    @objc private func buttonPressed(_ sender: UIButton) {
+        UIView.animate(withDuration: 0.05) {
+            sender.layer.shadowOffset = CGSize(width: 2, height: 2)
+            sender.transform = CGAffineTransform(translationX: 2, y: 2)
+        }
+    }
+
+    @objc private func buttonReleased(_ sender: UIButton) {
+        UIView.animate(withDuration: 0.05) {
+            sender.layer.shadowOffset = CGSize(width: 4, height: 4)
+            sender.transform = .identity
+        }
+    }
 
     @objc private func didEnterBackground() {
-        try? save(to: saveURL)
-        if let startTime = gameStartTime {
-            Storage.shared.savedGameStartTime = startTime
-        }
+        // Only save if game is actually in progress, not finished
         if game.inProgress {
-            pause()
+            try? save(to: saveURL)
+            if let startTime = gameStartTime {
+                Storage.shared.savedGameStartTime = startTime
+            }
+            pauseGame()
         }
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         updateUI()
+        // Theme logic remains
         if let themeName = Storage.shared.boardTheme,
            let theme = Theme(rawValue: themeName) {
             boardView?.theme = theme
@@ -117,7 +199,7 @@ class ViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         if isPaused {
-            pause()
+            pauseGame()
         }
     }
 
@@ -125,21 +207,23 @@ class ViewController: UIViewController {
         .portrait
     }
 
-    @IBAction private func togglePlayerType() {
-        game.whiteIsHuman = true
-        game.blackIsHuman = blackToggle?.selectedSegmentIndex == 0
+    @objc private func togglePlayerType() {
+        SoundManager.shared.playButtonSound()
+        // Toggle black player state
+        game.blackIsHuman.toggle()
+        
+        game.whiteIsHuman = true // Always true for now based on previous code
+        
+        updateModeButtonText()
         makeComputerMove()
     }
     
-    private func applyPixelStyle(to button: UIButton?) {
-        guard let button = button else { return }
-        button.backgroundColor = UIColor(white: 0.2, alpha: 0.8)
-        button.layer.borderWidth = 2
-        button.layer.borderColor = UIColor.white.cgColor
-        button.layer.cornerRadius = 4
-        button.setTitleColor(.white, for: .normal)
-        button.titleLabel?.font = UIFont.monospacedSystemFont(ofSize: 14, weight: .bold)
+    private func updateModeButtonText() {
+        let text = game.blackIsHuman ? "ЧЕРНЫЕ: ИГРОК" : "ЧЕРНЫЕ: БОТ"
+        modeButton?.setTitle(text, for: .normal)
     }
+
+    /* Undo removed */
     
     @objc private func exitTapped() {
         SoundManager.shared.playButtonSound()
@@ -157,6 +241,13 @@ class ViewController: UIViewController {
     
     private func performExit() {
         SoundManager.shared.playButtonSound()
+        
+        // Clear saved game if game is finished
+        if !game.inProgress {
+            try? FileManager.default.removeItem(at: saveURL)
+            Storage.shared.savedGameStartTime = nil
+        }
+        
         if let windowScene = view.window?.windowScene,
            let delegate = windowScene.delegate as? SceneDelegate,
            delegate.window?.rootViewController == self {
@@ -175,6 +266,12 @@ class ViewController: UIViewController {
 
     @IBAction private func resetGame() {
         SoundManager.shared.playButtonSound()
+        
+        // Clear any previous game result and saved state
+        gameResult = nil
+        try? FileManager.default.removeItem(at: saveURL)
+        Storage.shared.savedGameStartTime = nil
+        
         game.reset()
         gameStartTime = Date()
         UIView.animate(withDuration: 0.4, animations: {
@@ -186,6 +283,8 @@ class ViewController: UIViewController {
         setSelection(nil)
     }
 
+    // Undo function removed
+/*
     @IBAction private func undo() {
         SoundManager.shared.playButtonSound()
         game.undo()
@@ -202,6 +301,7 @@ class ViewController: UIViewController {
         })
         setSelection(nil)
     }
+*/
 
     @IBAction private func settings() {
         SoundManager.shared.playButtonSound()
@@ -249,14 +349,19 @@ extension ViewController: BoardViewDelegate {
     }
 }
 
-private extension ViewController {
+    // canUndo removed
+/*
     var canUndo: Bool {
         game.inProgress && (game.playerIsHuman() || game.playerIsHuman(game.turn.other))
     }
+*/
+
+extension ViewController {
 
     func updateUI() {
-        setControl(undoButton, enabled: canUndo)
-        setControl(resetButton, enabled: game.inProgress)
+        // Undo/Reset logic handled by custom UI state if needed, mostly handled by button actions now
+        // setControl(undoButton, enabled: canUndo) // Removed
+        // setControl(resetButton, enabled: game.inProgress) // Removed
         boardView?.flipBlackPieces = game.blackIsHuman && Storage.shared.flipBlackWhenHuman
     }
 
@@ -317,7 +422,7 @@ private extension ViewController {
     }
     
 
-    func pause() {
+    func pauseGame() {
         isPaused = true
         switch game.state {
         case .check, .idle:
@@ -434,6 +539,12 @@ private extension ViewController {
     
     // Moved helper here since it's private to file/extension
     private func submitGameResult(result: String, opponentType: String) {
+        // Prevent duplicate submissions
+        guard gameResult != nil else {
+            print("⚠️ Попытка повторной отправки результата предотвращена")
+            return
+        }
+        
         let startTime = gameStartTime ?? Date()
         if gameStartTime == nil {
              print("⚠️ Время начала не найдено, используем текущее время (0 длительность)")
@@ -443,23 +554,32 @@ private extension ViewController {
         let isDraw = (result == "draw")
         let elo = 0 
         
+        // Calculate duration
+        let duration = Date().timeIntervalSince(startTime)
+        print("⏱️ Game Duration: \(String(format: "%.2f", duration)) seconds")
+        
+        // Clear game result immediately to prevent duplicate submissions
+        gameResult = nil
+        gameStartTime = nil
+        Storage.shared.savedGameStartTime = nil
+        
+        // Clear saved game file since game is finished
+        try? FileManager.default.removeItem(at: saveURL)
+        
         APIService.shared.submitGameResult(
             isWin: isWin,
             isDraw: isDraw,
             eloBefore: elo,
-            eloAfter: elo
+            eloAfter: elo,
+            duration: duration
         ) { result in
             switch result {
             case .success:
-                print("Результат игры успешно отправлен на сервер")
+                print("✅ Результат игры успешно отправлен на сервер (с временем)")
             case .failure(let error):
-                print("Ошибка отправки результата игры: \(error.localizedDescription)")
+                print("❌ Ошибка отправки результата игры: \(error.localizedDescription)")
             }
         }
-        
-        gameStartTime = nil
-        Storage.shared.savedGameStartTime = nil
-        gameResult = nil
     }
 }
 

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="24412" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22684"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24405"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -25,7 +25,7 @@
                                 </constraints>
                             </view>
                             <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="XI6-5z-ZD0">
-                                <rect key="frame" x="233" y="139" width="161" height="32"/>
+                                <rect key="frame" x="234" y="139" width="160" height="32"/>
                                 <segments>
                                     <segment title="Human"/>
                                     <segment title="Computer"/>
@@ -35,13 +35,13 @@
                                 </connections>
                             </segmentedControl>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="White" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="BMt-yP-W2a">
-                                <rect key="frame" x="183" y="145.5" width="40" height="18"/>
+                                <rect key="frame" x="184" y="145.5" width="40" height="18"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="1" translatesAutoresizingMaskIntoConstraints="NO" id="wW6-Bz-2dd">
-                                <rect key="frame" x="233" y="190" width="161" height="32"/>
+                                <rect key="frame" x="234" y="190" width="160" height="32"/>
                                 <segments>
                                     <segment title="Human"/>
                                     <segment title="Computer"/>
@@ -51,13 +51,13 @@
                                 </connections>
                             </segmentedControl>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Black" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Hkk-4j-vt4">
-                                <rect key="frame" x="185.5" y="196.5" width="37.5" height="18"/>
+                                <rect key="frame" x="186.5" y="196.5" width="37.5" height="18"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" alignment="bottom" translatesAutoresizingMaskIntoConstraints="NO" id="khe-up-ENp">
-                                <rect key="frame" x="75" y="705" width="264" height="38"/>
+                                <rect key="frame" x="141" y="705" width="132" height="38"/>
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0Eh-VO-35h">
                                         <rect key="frame" x="0.0" y="0.0" width="132" height="38"/>
@@ -65,15 +65,6 @@
                                         <state key="normal" title="Restart game"/>
                                         <connections>
                                             <action selector="resetGame" destination="BYZ-38-t0r" eventType="touchUpInside" id="D1t-IJ-d9g"/>
-                                        </connections>
-                                    </button>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="PR8-7h-n5j">
-                                        <rect key="frame" x="132" y="0.0" width="132" height="38"/>
-                                        <inset key="contentEdgeInsets" minX="20" minY="10" maxX="20" maxY="10"/>
-                                        <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
-                                        <state key="normal" title="Settings"/>
-                                        <connections>
-                                            <action selector="settings" destination="BYZ-38-t0r" eventType="touchUpInside" id="RWA-Dq-Pxa"/>
                                         </connections>
                                     </button>
                                 </subviews>

@@ -3,7 +3,6 @@ import UIKit
 
 class LoginViewController: UIViewController {
     var onSuccess: (() -> Void)?
-    private var stars: [UIView] = []
 
     private let nameTextfield = UITextField()
     private let passwordTextField = UITextField()
@@ -15,14 +14,6 @@ class LoginViewController: UIViewController {
         setupPixelBackground()
         setupUI()
         setupKeyboardHandling()
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        // Создаем звезды асинхронно после появления экрана для лучшей производительности
-        DispatchQueue.main.async { [weak self] in
-            self?.setupStarAnimation()
-        }
     }
 
     private func setupPixelBackground() {
@@ -40,46 +31,7 @@ class LoginViewController: UIViewController {
         view.layer.insertSublayer(gradientLayer, at: 0)
     }
 
-    private func setupStarAnimation() {
-        // Оптимизация: создаем меньше звезд и более эффективно
-        let starCount = 15 // Уменьшено с 25 для лучшей производительности
-        
-        var starViews: [UIView] = []
-        for i in 0 ..< starCount {
-            let star = UIView()
-            let size: CGFloat = [4, 6, 8].randomElement()!
-            star.frame = CGRect(
-                x: CGFloat.random(in: 0 ... view.bounds.width),
-                y: CGFloat.random(in: 0 ... view.bounds.height),
-                width: size,
-                height: size
-            )
-            star.backgroundColor = .white
-            star.alpha = CGFloat.random(in: 0.3 ... 1.0)
-            star.layer.shouldRasterize = true
-            star.layer.rasterizationScale = UIScreen.main.scale
-            starViews.append(star)
-            stars.append(star)
-        }
-        
-        // Добавляем все звезды одним пакетом
-        for star in starViews {
-            view.addSubview(star)
-        }
-        
-        // Запускаем анимации с задержкой
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
-            guard let self = self else { return }
-            for (i, star) in starViews.enumerated() {
-                let duration = Double.random(in: 1.5 ... 3.0)
-                let delay = Double(i) * 0.05
-                
-                UIView.animate(withDuration: duration, delay: delay, options: [.repeat, .autoreverse, .curveEaseInOut], animations: {
-                    star.alpha = CGFloat.random(in: 0.2 ... 1.0)
-                }, completion: nil)
-            }
-        }
-    }
+
 
     private func setupUI() {
         // Кнопка назад в пиксельном стиле

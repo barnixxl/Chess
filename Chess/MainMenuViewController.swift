@@ -1,22 +1,13 @@
-
 import UIKit
 
 class MainMenuViewController: UIViewController {
-    private var pixelParticles: [UIView] = []
 
     override func viewDidLoad() {
         super.viewDidLoad()
         setupPixelBackground()
         setupUI()
     }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        // Создаем звезды асинхронно после появления экрана для лучшей производительности
-        DispatchQueue.main.async { [weak self] in
-            // Stars removed
-        }
-    }
+
     
     private func setupPixelBackground() {
         // Пиксельный градиентный фон
@@ -34,8 +25,6 @@ class MainMenuViewController: UIViewController {
         gradientLayer.rasterizationScale = UIScreen.main.scale
         view.layer.insertSublayer(gradientLayer, at: 0)
     }
-
-    // Star animation function removed
     
     private func setupUI() {
         // Заголовок в стиле пиксельной игры
@@ -51,126 +40,91 @@ class MainMenuViewController: UIViewController {
         titleLabel.layer.shadowOpacity = 1.0
         view.addSubview(titleLabel)
         
-        // Шахматная иконка под заголовком
-        let chessIcon = UILabel()
-        chessIcon.text = "♔"
-        chessIcon.font = UIFont.systemFont(ofSize: 70)
-        chessIcon.textAlignment = .center
-        chessIcon.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(chessIcon)
-
-        // Большая кнопка игры с компьютером по центру с иконкой
-        let playButton = createPixelButton(title: "ИГРА С КОМПЬЮТЕРОМ", color: UIColor(red: 0.9, green: 0.7, blue: 0.3, alpha: 1.0))
-        playButton.addTarget(self, action: #selector(playTapped), for: .touchUpInside)
-        playButton.translatesAutoresizingMaskIntoConstraints = false
+        // Buttons in "stairs" layout
         
-        // Add chess icon to play button
-        if let playIcon = UIImage(named: "play_icon") {
-            playButton.setImage(playIcon, for: .normal)
-            playButton.imageView?.contentMode = .scaleAspectFit
-            playButton.titleEdgeInsets = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 0)
-            playButton.imageEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 10)
-        }
-        view.addSubview(playButton)
-
-        // Маленькие иконки внизу
-        let bottomIconsStack = UIStackView()
-        bottomIconsStack.axis = .horizontal
-        bottomIconsStack.spacing = 20
-        bottomIconsStack.alignment = .center
-        bottomIconsStack.distribution = .fillEqually
-        bottomIconsStack.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(bottomIconsStack)
-
-        // Create beautiful icon buttons with chess symbols and images
-        let leaderboardButton = createEnhancedIconButton(
-            imageName: "leaderboard_icon",
-            fallbackSymbol: "♔",
+        // 1. ИГРА С КОМПЬЮТЕРОМ (Top Left)
+        let playButton = createMenuButton(
+            title: "ИГРА С КОМПЬЮТЕРОМ",
             color: UIColor(red: 0.9, green: 0.7, blue: 0.3, alpha: 1.0)
         )
-        leaderboardButton.addTarget(self, action: #selector(leaderboardTapped), for: .touchUpInside)
-        bottomIconsStack.addArrangedSubview(leaderboardButton)
+        playButton.addTarget(self, action: #selector(playTapped), for: .touchUpInside)
+        view.addSubview(playButton)
         
-        let settingsButton = createEnhancedIconButton(
-            imageName: nil,
-            fallbackSymbol: "♟",
+        // 2. РЕЙТИНГ (Mid Left)
+        let leaderboardButton = createMenuButton(
+            title: "РЕЙТИНГ",
+            color: UIColor(red: 0.4, green: 0.7, blue: 0.9, alpha: 1.0)
+        )
+        leaderboardButton.addTarget(self, action: #selector(leaderboardTapped), for: .touchUpInside)
+        view.addSubview(leaderboardButton)
+        
+        // 3. НАСТРОЙКИ (Mid Right)
+        let settingsButton = createMenuButton(
+            title: "НАСТРОЙКИ",
             color: UIColor(red: 0.6, green: 0.6, blue: 0.7, alpha: 1.0)
         )
         settingsButton.addTarget(self, action: #selector(accountSettingsTapped), for: .touchUpInside)
-        bottomIconsStack.addArrangedSubview(settingsButton)
+        view.addSubview(settingsButton)
         
-        let statisticsButton = createEnhancedIconButton(
-            imageName: nil,
-            fallbackSymbol: "♜",
+        // 4. СТАТИСТИКА (Bottom Right)
+        let statisticsButton = createMenuButton(
+            title: "СТАТИСТИКА",
             color: UIColor(red: 0.4, green: 0.7, blue: 0.6, alpha: 1.0)
         )
         statisticsButton.addTarget(self, action: #selector(statisticsTapped), for: .touchUpInside)
-        bottomIconsStack.addArrangedSubview(statisticsButton)
+        view.addSubview(statisticsButton)
 
         NSLayoutConstraint.activate([
+            // Title
             titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 40),
             
-            chessIcon.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            chessIcon.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 10),
+            // Play Button: Higher up, slightly left
+            playButton.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: 0),
+            playButton.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 40),
+            playButton.widthAnchor.constraint(equalToConstant: 280),
+            playButton.heightAnchor.constraint(equalToConstant: 60),
             
-            playButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            playButton.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: 20),
-            playButton.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.8),
-            playButton.heightAnchor.constraint(equalToConstant: 80),
+            // Leaderboard Button: Below Play, slightly right of start
+            leaderboardButton.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: 0),
+            leaderboardButton.topAnchor.constraint(equalTo: playButton.bottomAnchor, constant: 40),
+            leaderboardButton.widthAnchor.constraint(equalToConstant: 280),
+            leaderboardButton.heightAnchor.constraint(equalToConstant: 60),
             
-            bottomIconsStack.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            bottomIconsStack.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -30),
-            bottomIconsStack.widthAnchor.constraint(equalToConstant: 240),
-            bottomIconsStack.heightAnchor.constraint(equalToConstant: 70)
+            // Settings Button: Below Leaderboard, further right
+            settingsButton.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: 0),
+            settingsButton.topAnchor.constraint(equalTo: leaderboardButton.bottomAnchor, constant: 40),
+            settingsButton.widthAnchor.constraint(equalToConstant: 280),
+            settingsButton.heightAnchor.constraint(equalToConstant: 60),
+            
+            // Statistics Button: Below Settings, furthest right
+            statisticsButton.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: 0),
+            statisticsButton.topAnchor.constraint(equalTo: settingsButton.bottomAnchor, constant: 40),
+            statisticsButton.widthAnchor.constraint(equalToConstant: 280),
+            statisticsButton.heightAnchor.constraint(equalToConstant: 60)
         ])
     }
     
-    private func createEnhancedIconButton(imageName: String?, fallbackSymbol: String, color: UIColor) -> UIButton {
+    private func createMenuButton(title: String, color: UIColor) -> UIButton {
         let button = UIButton(type: .system)
         
-        // Try to use image first, fallback to chess symbol
-        if let imageName = imageName, let image = UIImage(named: imageName) {
-            button.setImage(image, for: .normal)
-            button.imageView?.contentMode = .scaleAspectFit
-            button.tintColor = .white
-        } else {
-            button.setTitle(fallbackSymbol, for: .normal)
-            button.titleLabel?.font = UIFont.systemFont(ofSize: 40)
-            button.setTitleColor(.white, for: .normal)
-        }
+        button.setTitle(title, for: .normal)
+        button.titleLabel?.font = UIFont.monospacedSystemFont(ofSize: 20, weight: .black)
+        button.setTitleColor(.white, for: .normal)
         
         button.backgroundColor = color
         button.layer.cornerRadius = 8
         button.layer.borderWidth = 4
         button.layer.borderColor = UIColor.black.cgColor
+        
+        // Pixel art style shadow
         button.layer.shadowColor = UIColor.black.cgColor
         button.layer.shadowOffset = CGSize(width: 5, height: 5)
         button.layer.shadowRadius = 0
         button.layer.shadowOpacity = 1.0
-        button.widthAnchor.constraint(equalToConstant: 70).isActive = true
-        button.heightAnchor.constraint(equalToConstant: 70).isActive = true
 
-        button.addTarget(self, action: #selector(buttonPressed(_:)), for: .touchDown)
-        button.addTarget(self, action: #selector(buttonReleased(_:)), for: [.touchUpInside, .touchUpOutside, .touchCancel])
-
-        return button
-    }
-
-    private func createPixelButton(title: String, color: UIColor) -> UIButton {
-        let button = UIButton(type: .system)
-        button.setTitle(title, for: .normal)
-        button.titleLabel?.font = UIFont.monospacedSystemFont(ofSize: 22, weight: .black)
-        button.setTitleColor(.white, for: .normal)
-        button.backgroundColor = color
-        button.layer.cornerRadius = 0
-        button.layer.borderWidth = 4
-        button.layer.borderColor = UIColor.black.cgColor
-        button.layer.shadowColor = UIColor.black.cgColor
-        button.layer.shadowOffset = CGSize(width: 6, height: 6)
-        button.layer.shadowRadius = 0
-        button.layer.shadowOpacity = 1.0
-
+        button.translatesAutoresizingMaskIntoConstraints = false
+        
         button.addTarget(self, action: #selector(buttonPressed(_:)), for: .touchDown)
         button.addTarget(self, action: #selector(buttonReleased(_:)), for: [.touchUpInside, .touchUpOutside, .touchCancel])
 

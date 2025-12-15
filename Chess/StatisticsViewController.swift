@@ -71,21 +71,6 @@ class StatisticsViewController: UIViewController {
         gradientLayer.startPoint = CGPoint(x: 0, y: 0)
         gradientLayer.endPoint = CGPoint(x: 1, y: 1)
         view.layer.insertSublayer(gradientLayer, at: 0)
-        
-        // Add stars
-        for _ in 0 ..< 20 {
-            let star = UIView()
-            let size: CGFloat = [4, 6].randomElement()!
-            star.frame = CGRect(
-                x: CGFloat.random(in: 0 ... view.bounds.width),
-                y: CGFloat.random(in: 0 ... view.bounds.height),
-                width: size,
-                height: size
-            )
-            star.backgroundColor = .white
-            star.alpha = CGFloat.random(in: 0.3 ... 0.8)
-            view.addSubview(star)
-        }
     }
     
     private func setupUI() {

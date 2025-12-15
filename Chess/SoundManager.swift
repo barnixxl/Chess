@@ -31,28 +31,48 @@ class SoundManager {
         ]
         
         for (key, filename) in soundFiles {
-            if let path = Bundle.main.path(forResource: filename, ofType: "mp3") {
+            if let path = findSoundPath(for: filename) {
                 do {
                     let player = try AVAudioPlayer(contentsOf: URL(fileURLWithPath: path))
                     player.prepareToPlay()
                     soundEffectPlayers[key] = player
+                    print("✅ Successfully loaded sound: \(filename)")
                 } catch {
-                    print("Failed to load sound \(filename): \(error)")
+                    print("❌ Failed to load sound \(filename): \(error)")
                 }
+            } else {
+                 print("⚠️ Sound file not found: \(filename)")
             }
         }
         
         // Load background music
-        if let path = Bundle.main.path(forResource: "FonMusic", ofType: "mp3") {
+        if let path = findSoundPath(for: "FonMusic") {
             do {
                 backgroundMusicPlayer = try AVAudioPlayer(contentsOf: URL(fileURLWithPath: path))
                 backgroundMusicPlayer?.numberOfLoops = -1 // Loop indefinitely
                 backgroundMusicPlayer?.volume = Storage.shared.backgroundMusicVolume
                 backgroundMusicPlayer?.prepareToPlay()
+                print("✅ Successfully loaded background music")
             } catch {
-                print("Failed to load background music: \(error)")
+                print("❌ Failed to load background music: \(error)")
             }
+        } else {
+            print("⚠️ Background music file 'FonMusic' not found")
         }
+    }
+    
+    private func findSoundPath(for filename: String) -> String? {
+        // 1. Try root of bundle
+        if let path = Bundle.main.path(forResource: filename, ofType: "mp3") {
+            return path
+        }
+        
+        // 2. Try "Sounds" subdirectory (if folder reference)
+        if let path = Bundle.main.path(forResource: filename, ofType: "mp3", inDirectory: "Sounds") {
+            return path
+        }
+        
+        return nil
     }
     
     // MARK: - Background Music

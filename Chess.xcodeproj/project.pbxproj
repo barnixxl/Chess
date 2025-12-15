@@ -30,6 +30,12 @@
 		45B1C8E32EE8533F0083F58E /* LeaderboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45B1C8E22EE8533F0083F58E /* LeaderboardViewController.swift */; };
 		45B1C8E42EE8533F0083F58F /* StatisticsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45B1C8E12EE8533F0083F58F /* StatisticsViewController.swift */; };
 		45C2D8E52EE8534F0084F69G /* SoundManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45C2D8E42EE8534F0084F69G /* SoundManager.swift */; };
+		45E0D7592EF02AA500A98D48 /* ClickButton.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 45E0D7522EF02AA500A98D48 /* ClickButton.mp3 */; };
+		45E0D75A2EF02AA500A98D48 /* LoseChes.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 45E0D7542EF02AA500A98D48 /* LoseChes.mp3 */; };
+		45E0D75B2EF02AA500A98D48 /* FonMusic.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 45E0D7532EF02AA500A98D48 /* FonMusic.mp3 */; };
+		45E0D75C2EF02AA500A98D48 /* MoveChess.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 45E0D7562EF02AA500A98D48 /* MoveChess.mp3 */; };
+		45E0D75D2EF02AA500A98D48 /* LoseGame.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 45E0D7552EF02AA500A98D48 /* LoseGame.mp3 */; };
+		45E0D75E2EF02AA500A98D48 /* WinGame.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 45E0D7572EF02AA500A98D48 /* WinGame.mp3 */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -69,6 +75,12 @@
 		45B1C8E12EE8533F0083F58F /* StatisticsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsViewController.swift; sourceTree = "<group>"; };
 		45B1C8E22EE8533F0083F58E /* LeaderboardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeaderboardViewController.swift; sourceTree = "<group>"; };
 		45C2D8E42EE8534F0084F69G /* SoundManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundManager.swift; sourceTree = "<group>"; };
+		45E0D7522EF02AA500A98D48 /* ClickButton.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = ClickButton.mp3; sourceTree = "<group>"; };
+		45E0D7532EF02AA500A98D48 /* FonMusic.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = FonMusic.mp3; sourceTree = "<group>"; };
+		45E0D7542EF02AA500A98D48 /* LoseChes.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = LoseChes.mp3; sourceTree = "<group>"; };
+		45E0D7552EF02AA500A98D48 /* LoseGame.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = LoseGame.mp3; sourceTree = "<group>"; };
+		45E0D7562EF02AA500A98D48 /* MoveChess.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = MoveChess.mp3; sourceTree = "<group>"; };
+		45E0D7572EF02AA500A98D48 /* WinGame.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = WinGame.mp3; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -116,6 +128,7 @@
 				4550188F2ECE8C4000F38230 /* LoginViewController.swift */,
 				455018902ECE8C4000F38230 /* RegisterViewController.swift */,
 				4521C7AB2ED644DC007E5B8F /* MainMenuViewController.swift */,
+				45E0D7582EF02AA500A98D48 /* Sounds */,
 				4566C8E12ED73E410053582C /* AccountSettingsViewController.swift */,
 				45B1C8E22EE8533F0083F58E /* LeaderboardViewController.swift */,
 				45B1C8E12EE8533F0083F58F /* StatisticsViewController.swift */,
@@ -143,6 +156,19 @@
 				01DD40AD2C41CE2000D63D2B /* GameTests.swift */,
 			);
 			path = ChessTests;
+			sourceTree = "<group>";
+		};
+		45E0D7582EF02AA500A98D48 /* Sounds */ = {
+			isa = PBXGroup;
+			children = (
+				45E0D7522EF02AA500A98D48 /* ClickButton.mp3 */,
+				45E0D7532EF02AA500A98D48 /* FonMusic.mp3 */,
+				45E0D7542EF02AA500A98D48 /* LoseChes.mp3 */,
+				45E0D7552EF02AA500A98D48 /* LoseGame.mp3 */,
+				45E0D7562EF02AA500A98D48 /* MoveChess.mp3 */,
+				45E0D7572EF02AA500A98D48 /* WinGame.mp3 */,
+			);
+			path = Sounds;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -228,6 +254,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				01642A91251A882800039186 /* LaunchScreen.storyboard in Resources */,
+				45E0D7592EF02AA500A98D48 /* ClickButton.mp3 in Resources */,
+				45E0D75A2EF02AA500A98D48 /* LoseChes.mp3 in Resources */,
+				45E0D75B2EF02AA500A98D48 /* FonMusic.mp3 in Resources */,
+				45E0D75C2EF02AA500A98D48 /* MoveChess.mp3 in Resources */,
+				45E0D75D2EF02AA500A98D48 /* LoseGame.mp3 in Resources */,
+				45E0D75E2EF02AA500A98D48 /* WinGame.mp3 in Resources */,
 				01642A8E251A882800039186 /* Assets.xcassets in Resources */,
 				01642A8C251A882400039186 /* Main.storyboard in Resources */,
 			);

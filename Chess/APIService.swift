@@ -504,16 +504,17 @@ class APIService {
     // MARK: - Game Results
     
     // API: POST /game/ 
-    // Body: { "isWin": bool, "isDraw": bool, "eloBefore": int, "eloAfter": int, "result": "string" }
+    // Body: { "isWin": bool, "isDraw": bool, "eloBefore": int, "eloAfter": int, "result": "string", "duration": double }
     struct GameResultRequestAPI: Codable {
         let isWin: Bool
         let isDraw: Bool
         let eloBefore: Int
         let eloAfter: Int
-        let result: String // Adding result string as server err indicated it is required
+        let result: String
+        let duration: Double // Time in seconds
     }
     
-    func submitGameResult(isWin: Bool, isDraw: Bool, eloBefore: Int, eloAfter: Int, completion: @escaping (Result<SuccessResponse, APIError>) -> Void) {
+    func submitGameResult(isWin: Bool, isDraw: Bool, eloBefore: Int, eloAfter: Int, duration: Double, completion: @escaping (Result<SuccessResponse, APIError>) -> Void) {
         guard let token = Storage.shared.authToken else {
             completion(.failure(.networkError("Требуется авторизация")))
             return
@@ -524,15 +525,13 @@ class APIService {
             return
         }
         
-        // Determine result string based on flags if not provided?
-        // Actually the method signature should probably accept result string or we infer it.
-        // For now inferring:
+        // Determine result string
         let resultString: String
         if isDraw { resultString = "draw" }
         else if isWin { resultString = "win" }
         else { resultString = "lose" }
         
-        let requestBody = GameResultRequestAPI(isWin: isWin, isDraw: isDraw, eloBefore: eloBefore, eloAfter: eloAfter, result: resultString)
+        let requestBody = GameResultRequestAPI(isWin: isWin, isDraw: isDraw, eloBefore: eloBefore, eloAfter: eloAfter, result: resultString, duration: duration)
         
         var request = URLRequest(url: url)
         request.httpMethod = "POST"

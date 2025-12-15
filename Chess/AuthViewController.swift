@@ -2,8 +2,6 @@
 import UIKit
 
 class AuthViewController: UIViewController {
-    private var stars: [UIView] = []
-    private var pixelParticles: [UIView] = []
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -11,13 +9,7 @@ class AuthViewController: UIViewController {
         setupUI()
     }
     
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        // Создаем звезды асинхронно после появления экрана для лучшей производительности
-        DispatchQueue.main.async { [weak self] in
-            self?.setupStarAnimation()
-        }
-    }
+
 
     private func setupPixelBackground() {
         // Пиксельный градиентный фон
@@ -36,83 +28,7 @@ class AuthViewController: UIViewController {
         view.layer.insertSublayer(gradientLayer, at: 0)
     }
 
-    private func setupStarAnimation() {
-        // Оптимизация: создаем меньше звезд и более эффективно
-        let starCount = 20 // Уменьшено с 30
-        let particleCount = 5 // Уменьшено с 8
-        
-        var starViews: [UIView] = []
-        for i in 0 ..< starCount {
-            let star = UIView()
-            let size: CGFloat = [4, 6, 8].randomElement()!
-            star.frame = CGRect(
-                x: CGFloat.random(in: 0 ... view.bounds.width),
-                y: CGFloat.random(in: 0 ... view.bounds.height),
-                width: size,
-                height: size
-            )
-            star.backgroundColor = .white
-            star.alpha = CGFloat.random(in: 0.3 ... 1.0)
-            star.layer.shouldRasterize = true
-            star.layer.rasterizationScale = UIScreen.main.scale
-            starViews.append(star)
-            stars.append(star)
-        }
-        
-        // Добавляем все звезды одним пакетом
-        for star in starViews {
-            view.addSubview(star)
-        }
-        
-        // Запускаем анимации звезд с задержкой
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
-            guard let self = self else { return }
-            for (i, star) in starViews.enumerated() {
-                let duration = Double.random(in: 1.5 ... 3.0)
-                let delay = Double(i) * 0.05
-                
-                UIView.animate(withDuration: duration, delay: delay, options: [.repeat, .autoreverse, .curveEaseInOut], animations: {
-                    star.alpha = CGFloat.random(in: 0.2 ... 1.0)
-                }, completion: nil)
-            }
-        }
-        
-        // Добавляем падающие пиксельные частицы (оптимизировано)
-        var particleViews: [UIView] = []
-        for i in 0 ..< particleCount {
-            let particle = UIView()
-            let size: CGFloat = 6
-            particle.frame = CGRect(
-                x: CGFloat.random(in: 0 ... view.bounds.width),
-                y: -size,
-                width: size,
-                height: size
-            )
-            particle.backgroundColor = UIColor(red: 0.5, green: 0.8, blue: 1.0, alpha: 0.6)
-            particle.layer.shouldRasterize = true
-            particle.layer.rasterizationScale = UIScreen.main.scale
-            particleViews.append(particle)
-            pixelParticles.append(particle)
-        }
-        
-        // Добавляем все частицы одним пакетом
-        for particle in particleViews {
-            view.addSubview(particle)
-        }
-        
-        // Запускаем анимации частиц с задержкой
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
-            guard let self = self else { return }
-            for (i, particle) in particleViews.enumerated() {
-                let duration = Double.random(in: 4 ... 8)
-                let delay = Double(i) * 0.3
-                
-                UIView.animate(withDuration: duration, delay: delay, options: [.repeat, .curveLinear], animations: {
-                    particle.frame.origin.y = self.view.bounds.height + 6
-                }, completion: nil)
-            }
-        }
-    }
+
 
     private func setupUI() {
         // Пиксельный заголовок
