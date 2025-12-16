@@ -121,7 +121,7 @@ class BoardView: UIView {
                 usedIDs.insert(piece.id)
                 view.image = UIImage(named: piece.imageName)
                 view.frame = frame(x: j, y: i, size: size)
-                var transform = CATransform3DMakeScale(0.8, 0.8, 0)
+                var transform = CATransform3DMakeScale(0.95, 0.95, 0)
                 let rotate = flipBlackPieces && piece.color == .black
                 transform = CATransform3DRotate(transform, rotate ? .pi : 0, 0, 0, 1)
                 view.layer.transform = transform
